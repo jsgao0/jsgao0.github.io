@@ -70,4 +70,4 @@ theme: landscape
 deploy:
   type: git
   repo: git@github.com:jsgao0/jsgao0.github.io.git
-  branch: master
+  branch: gh-pages
