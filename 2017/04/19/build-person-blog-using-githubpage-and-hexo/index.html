@@ -26,8 +26,8 @@
 <meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-github-setup-deploy-key.png">
 <meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-hello-world.png">
 <meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-ssh-url.png">
-<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-setup-gh-pages-branch.png">
-<meta property="og:updated_time" content="2017-04-20T07:49:31.438Z">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-setup-master-branch.png">
+<meta property="og:updated_time" content="2017-04-20T08:47:01.906Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="用Github Page和Hexo建立個人部落格">
 <meta name="twitter:description" content="因為常常看到許多大大用Jekyll或Hexo在Github Page上建個人部落格，所以也想自己試著用Hexo做個人部落格。這篇會記錄從沒有任何工具一直到建立好個人部落格。 GitGit是用來管理程式碼的工具，它最主要的特性就是分散式管理(分享程式碼)。 安裝Git到Git官方網站根據你的OS(作業系統)版本下載安裝程式，然後安裝它。  測試Git搜尋一下cmd.exe，並且打開它。 接著在命令視">
@@ -198,10 +198,10 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson\blog\jsgao0&gt; git remote add origin ssh_url &lt;--連結貼在這裡</div><div class="line">C:\Users\anson\blog\jsgao0&gt; git remote -v // 查看有沒有設定成功</div><div class="line">origin  https://github.com/jsgao0/jsgao0.github.io.git (fetch)</div><div class="line">origin  https://github.com/jsgao0/jsgao0.github.io.git (push)</div></pre></td></tr></table></figure>
 <h3 id="把剛才新增在master分支上的commit上傳到Github"><a href="#把剛才新增在master分支上的commit上傳到Github" class="headerlink" title="把剛才新增在master分支上的commit上傳到Github"></a>把剛才新增在master分支上的commit上傳到Github</h3><p>提醒一下，這只是把程式碼傳到Github，並不是<strong>發佈</strong>部落格哦!</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson\blog\jsgao0&gt; git push origin master</div><div class="line">Counting objects: 107, done.</div><div class="line">Delta compression using up to 8 threads.</div><div class="line">Compressing objects: 100% (97/97), done.</div><div class="line">Writing objects: 100% (107/107), 520.86 KiB | 0 bytes/s, done.</div><div class="line">Total 107 (delta 0), reused 0 (delta 0)</div><div class="line">To https://github.com/jsgao0/jsgao0.github.io.git</div><div class="line"> * [new branch]      master -&gt; master</div></pre></td></tr></table></figure>
-<h3 id="發佈前的小小修改"><a href="#發佈前的小小修改" class="headerlink" title="發佈前的小小修改"></a>發佈前的小小修改</h3><p>記得剛剛我們放到Github的分支是master嗎?通常我們用git管理的時候，master是用來存放原始碼。然而，Github有個特殊的分支叫做gh-pages，這個分支是Github讓開發者在開發程式之後，除了README.md外，可以存放的靜態網頁，通常被用來當作官方網站、DEMO，而我們這次要用這個分支來做blog。</p>
-<p>在發佈到gh-pages分支之前，我們必須要做些修改，讓hexo能夠產出靜態網頁並且發佈到gh-pages上面。其實不困難，只要把剛剛的ssh url加到_config.yml就可以囉!</p>
+<h3 id="發佈前的小小修改"><a href="#發佈前的小小修改" class="headerlink" title="發佈前的小小修改"></a>發佈前的小小修改</h3><p>記得剛剛我們放到Github的分支是master嗎?通常我們用git管理的時候，master是用來存放原始碼。而且，在使用name.github.io這類網址的時候，Github會自動編譯master上面的檔案，製作成網頁。</p>
+<p>在發佈到Github之前，我們必須要做些修改，讓hexo能夠產出靜態網頁並且發佈到Github上面。其實不困難，只要把剛剛的ssh url加到_config.yml就可以囉!</p>
 <p>記住: type必須為git而非github(hexo 3.0之後無效了)</p>
-<p><img src="/images/build-person-blog-using-githubpage-and-hexo-setup-gh-pages-branch.png" alt="Add ssh url and set branch as gh-pages"></p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-setup-master-branch.png" alt="Add ssh url and set branch as master"></p>
 <h3 id="發佈"><a href="#發佈" class="headerlink" title="發佈!"></a>發佈!</h3><p>萬事俱備了，發佈吧!</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson\blog\jsgao0&gt; hexo d</div></pre></td></tr></table></figure>
 <h2 id="結論與心得"><a href="#結論與心得" class="headerlink" title="結論與心得"></a>結論與心得</h2><p>因為平常就有在使用npm、git和Github，所以一開始看了一些文件，花了一個多小時就搞定了。會需要花一個小時，主要是因為Windows的private key放的位置不正確，爬了許多文章才知道有固定位置。另外還花了一些時間在替換這個theme(預設的真的很陽春XD)，這部分有空再來分享怎麼替換:p。</p>
