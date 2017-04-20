@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="因為常常看到許多大大用Jekyll或Hexo在Github Page上建個人部落格，所以也想自己試著用Hexo做個人部落格。這篇會記錄從沒有任何工具一直到建立好個人部落格。 GitGit是用來管理程式碼的工具，它最主要的特性就是分散式管理(分享程式碼)。 安裝Git到Git官方網站根據你的OS(作業系統)版本下載安裝程式，然後安裝它。  測試Git搜尋一下cmd.exe，並且打開它。 接著在命令視">
+<meta name="keywords">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用Github Page和Hexo建立個人部落格">
+<meta property="og:url" content="https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/index.html">
+<meta property="og:site_name" content="Anson Keeps">
+<meta property="og:description" content="因為常常看到許多大大用Jekyll或Hexo在Github Page上建個人部落格，所以也想自己試著用Hexo做個人部落格。這篇會記錄從沒有任何工具一直到建立好個人部落格。 GitGit是用來管理程式碼的工具，它最主要的特性就是分散式管理(分享程式碼)。 安裝Git到Git官方網站根據你的OS(作業系統)版本下載安裝程式，然後安裝它。  測試Git搜尋一下cmd.exe，並且打開它。 接著在命令視">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-git-download.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-open-command-line-window.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-register-github.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-create-new-github-repository.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-create-new-github-repository-page.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-download-puttygen.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-start-puttygen.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-generating-puttygen.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-finish-puttygen.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-github-settings-page.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-github-setup-deploy-key.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-hello-world.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-ssh-url.png">
+<meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-setup-master-branch.png">
+<meta property="og:updated_time" content="2017-04-20T08:48:53.533Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用Github Page和Hexo建立個人部落格">
+<meta name="twitter:description" content="因為常常看到許多大大用Jekyll或Hexo在Github Page上建個人部落格，所以也想自己試著用Hexo做個人部落格。這篇會記錄從沒有任何工具一直到建立好個人部落格。 GitGit是用來管理程式碼的工具，它最主要的特性就是分散式管理(分享程式碼)。 安裝Git到Git官方網站根據你的OS(作業系統)版本下載安裝程式，然後安裝它。  測試Git搜尋一下cmd.exe，並且打開它。 接著在命令視">
+<meta name="twitter:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-git-download.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>用Github Page和Hexo建立個人部落格</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- rss -->
+    
+    
+</head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&text=用Github Page和Hexo建立個人部落格"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&title=用Github Page和Hexo建立個人部落格"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&is_video=false&description=用Github Page和Hexo建立個人部落格"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=用Github Page和Hexo建立個人部落格&body=Check out this article: https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&title=用Github Page和Hexo建立個人部落格"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&title=用Github Page和Hexo建立個人部落格"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&title=用Github Page和Hexo建立個人部落格"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&title=用Github Page和Hexo建立個人部落格"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&name=用Github Page和Hexo建立個人部落格&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Git"><span class="toc-number">1.</span> <span class="toc-text">Git</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安裝Git"><span class="toc-number">1.1.</span> <span class="toc-text">安裝Git</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#測試Git"><span class="toc-number">1.2.</span> <span class="toc-text">測試Git</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Github"><span class="toc-number">2.</span> <span class="toc-text">Github</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#申請Github帳號"><span class="toc-number">2.1.</span> <span class="toc-text">申請Github帳號</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#建立給部落格用的Repository"><span class="toc-number">2.2.</span> <span class="toc-text">建立給部落格用的Repository</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSH-Keys"><span class="toc-number">2.3.</span> <span class="toc-text">SSH Keys</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NodeJS-amp-NPM"><span class="toc-number">3.</span> <span class="toc-text">NodeJS & NPM</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安裝NodeJS-amp-NPM"><span class="toc-number">3.1.</span> <span class="toc-text">安裝NodeJS & NPM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#測試NodeJS-amp-NPM"><span class="toc-number">3.2.</span> <span class="toc-text">測試NodeJS & NPM</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#開始建立Blog"><span class="toc-number">4.</span> <span class="toc-text">開始建立Blog!</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安裝hexo"><span class="toc-number">4.1.</span> <span class="toc-text">安裝hexo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用hexo建立部落格"><span class="toc-number">4.2.</span> <span class="toc-text">用hexo建立部落格</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安裝hexo的佈署套件"><span class="toc-number">4.3.</span> <span class="toc-text">安裝hexo的佈署套件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在本地端測試有沒有建立成功"><span class="toc-number">4.4.</span> <span class="toc-text">在本地端測試有沒有建立成功</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#將你的部落格發佈到github"><span class="toc-number">5.</span> <span class="toc-text">將你的部落格發佈到github</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#把你的blog在git-history裡初始化"><span class="toc-number">5.1.</span> <span class="toc-text">把你的blog在git history裡初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#把原始碼加到Git-history裡"><span class="toc-number">5.2.</span> <span class="toc-text">把原始碼加到Git history裡</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#設定SSH-url"><span class="toc-number">5.3.</span> <span class="toc-text">設定SSH url</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#把剛才新增在master分支上的commit上傳到Github"><span class="toc-number">5.4.</span> <span class="toc-text">把剛才新增在master分支上的commit上傳到Github</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#發佈前的小小修改"><span class="toc-number">5.5.</span> <span class="toc-text">發佈前的小小修改</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#發佈"><span class="toc-number">5.6.</span> <span class="toc-text">發佈!</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#結論與心得"><span class="toc-number">6.</span> <span class="toc-text">結論與心得</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        用Github Page和Hexo建立個人部落格
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Anson Keeps</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2017-04-19T01:44:59.814Z" itemprop="datePublished">2017-04-19</time>
+    </div>
+
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>因為常常看到許多大大用<a href="https://jekyllrb.com/" target="_blank" rel="external">Jekyll</a>或<a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>在<a href="https://pages.github.com/" target="_blank" rel="external">Github Page</a>上建個人部落格，所以也想自己試著用Hexo做個人部落格。<br>這篇會記錄從沒有任何工具一直到建立好個人部落格。</p>
+<h2 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h2><p><a href="https://git-scm.com/" target="_blank" rel="external">Git</a>是用來管理程式碼的工具，它最主要的特性就是分散式管理(分享程式碼)。</p>
+<h3 id="安裝Git"><a href="#安裝Git" class="headerlink" title="安裝Git"></a>安裝Git</h3><p>到<a href="https://git-scm.com/" target="_blank" rel="external">Git</a>官方網站根據你的OS(作業系統)版本下載安裝程式，然後安裝它。</p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-git-download.png" alt="Click download button"></p>
+<h3 id="測試Git"><a href="#測試Git" class="headerlink" title="測試Git"></a>測試Git</h3><p>搜尋一下cmd.exe，並且打開它。<br><img src="/images/build-person-blog-using-githubpage-and-hexo-open-command-line-window.png" alt="Open command line window"></p>
+<p>接著在命令視窗裡面輸入下面的指令，來檢查git程式有沒有安裝成功。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson&gt; git --version</div><div class="line">git version 2.7.1.windows.2</div></pre></td></tr></table></figure></p>
+<h2 id="Github"><a href="#Github" class="headerlink" title="Github"></a>Github</h2><p><a href="https://github.com/" target="_blank" rel="external">Github</a>是提供Git的一個網路平台，我們可以將自己電腦上的程式碼透過Git建立版本後，發佈到Github上。<a href="http://www.ithome.com.tw/news/95283" target="_blank" rel="external">這邊有一篇</a>保哥寫的Github基礎文章，想知道較詳細內容的話，可以讀讀看。</p>
+<h3 id="申請Github帳號"><a href="#申請Github帳號" class="headerlink" title="申請Github帳號"></a>申請Github帳號</h3><p>Github的<a href="https://github.com/" target="_blank" rel="external">首頁</a>就是註冊頁，填完資料、驗證完email就可以囉!</p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-register-github.png" alt="Github home page"></p>
+<h3 id="建立給部落格用的Repository"><a href="#建立給部落格用的Repository" class="headerlink" title="建立給部落格用的Repository"></a>建立給部落格用的Repository</h3><p>申請之後，用帳號密碼登入。接著可以看到右上角有個＋，點一下，會有個 <strong>New Repository</strong> 的選項，點下去。</p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-create-new-github-repository.png" alt="Click add button then click new repository button"></p>
+<p>接著你的瀏覽器會跳到下面這頁。把 <strong>Repository Name</strong> 這欄填上<em>name.github.io</em>，其中name是你的帳號，例如:我的帳號是jsgao0，就填上<em>jsgao0.github.io</em>。 </p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-create-new-github-repository-page.png" alt="Create repository page"></p>
+<h3 id="SSH-Keys"><a href="#SSH-Keys" class="headerlink" title="SSH Keys"></a>SSH Keys</h3><p>嗯… 這個事幹嘛的? 跟Github有啥關係?</p>
+<blockquote><br>  SSH是目前較可靠，專為遠端登入對談和其他網路服務提供安全性的協定。<br>  <footer style="text-align: right;"><a href="https://zh.wikipedia.org/wiki/Secure_Shell" target="_blank" rel="external">https://zh.wikipedia.org/wiki/Secure_Shell</a></footer><br></blockquote>
+
+<p>在發佈到Github的時候，就是透過這個協定在傳輸的。然而，這個協定可以用兩種方式做安全驗證，密碼、金鑰。我們接下來要用金鑰的驗證方式，所以需要有一組公開金鑰+私有金鑰。 公開金鑰會被放在Github上面，而私有金鑰會放在你自己的電腦裡。</p>
+<p>說這麼多，要怎麼做? 先到<a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html" target="_blank" rel="external">Putty官網</a>下載金鑰產生器吧!</p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-download-puttygen.png" alt="Download puttygen"></p>
+<p>下載完之後，請執行它。接著你會看到 <strong>Generate</strong> 的按鈕，按下去就可以開始了!</p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-start-puttygen.png" alt="Start puttygen"></p>
+<p>產生的過程挺有趣的，你必須讓滑鼠指標一直在程式視窗的空白處移動。</p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-generating-puttygen.png" alt="Generating puttygen"></p>
+<p>產生完，我們直接將公開金鑰(public key)和私有金鑰(private key)分別存成id_rsa.pub和id_rsa，並且放到 <em>C:\Users\windows_user\.ssh</em> 的資料夾下面。</p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-finish-puttygen.png" alt="Finish puttygen"></p>
+<p>再來是最後步驟囉! 回到剛剛Github建立的repository頁面，點右上角的 <strong>Settings</strong>。</p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-github-settings-page.png" alt="Go to Github settings page"></p>
+<ol>
+<li>在Settings頁面，選擇左邊的 <strong>Deploy keys</strong> 選項。</li>
+<li>然後點右上角的 <strong>Add deploy key</strong>。</li>
+<li>再來就填入key的 <strong>title</strong> 和公開金鑰(把id_rsa.pub用記事本打開貼上)，要注意貼在Key這個欄位的公開金鑰，必須要以ssh-rsa開頭並空一格，再將public key的內容貼上。</li>
+</ol>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-github-setup-deploy-key.png" alt="Setup deploy key"></p>
+<h2 id="NodeJS-amp-NPM"><a href="#NodeJS-amp-NPM" class="headerlink" title="NodeJS &amp; NPM"></a>NodeJS &amp; NPM</h2><p><a href="https://nodejs.org/en/" target="_blank" rel="external">NodeJS</a>是基於JavaScript的伺服器端程式，<a href="https://www.npmjs.com/" target="_blank" rel="external">NPM</a>則是用來管理NodeJS模組與套件的工具。</p>
+<h3 id="安裝NodeJS-amp-NPM"><a href="#安裝NodeJS-amp-NPM" class="headerlink" title="安裝NodeJS &amp; NPM"></a>安裝NodeJS &amp; NPM</h3><p>不同以前NodeJS和NPM要分別安裝，現在只需要安裝NodeJS，就會順便幫你裝好NPM。到<a href="https://nodejs.org/en/download/" target="_blank" rel="external">官方網站</a>下載對應OS的版本並安裝。</p>
+<h3 id="測試NodeJS-amp-NPM"><a href="#測試NodeJS-amp-NPM" class="headerlink" title="測試NodeJS &amp; NPM"></a>測試NodeJS &amp; NPM</h3><p>測試NodeJS。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson&gt; node -v</div><div class="line">v6.10.2</div></pre></td></tr></table></figure></p>
+<p>測試NPM。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson&gt; npm -v</div><div class="line">3.10.5</div></pre></td></tr></table></figure></p>
+<h2 id="開始建立Blog"><a href="#開始建立Blog" class="headerlink" title="開始建立Blog!"></a>開始建立Blog!</h2><p>一堆前置作業終於做完了，來開始建立Blog吧!</p>
+<h3 id="安裝hexo"><a href="#安裝hexo" class="headerlink" title="安裝hexo"></a>安裝hexo</h3><p>這行指令是用來安裝hexo，要注意<em>-g</em>這個參數，它代表global，意思是裝到系統環境變數中，之後直接在命令提示字元視窗就能直接使用hexo的指令。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson&gt; npm install hexo -g</div></pre></td></tr></table></figure>
+<h3 id="用hexo建立部落格"><a href="#用hexo建立部落格" class="headerlink" title="用hexo建立部落格"></a>用hexo建立部落格</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson\&gt; mkdir blog // 建立資料夾</div><div class="line">C:\Users\anson\&gt; <span class="built_in">cd</span> blog // 切換到blog資料夾裡面</div><div class="line">C:\Users\anson\blog&gt; hexo init jsgao0 // 建立新的blog，名為jsgao0</div><div class="line">... // 一堆正在安裝的資訊</div><div class="line">INFO  Start blogging with Hexo!</div></pre></td></tr></table></figure>
+<h3 id="安裝hexo的佈署套件"><a href="#安裝hexo的佈署套件" class="headerlink" title="安裝hexo的佈署套件"></a>安裝hexo的佈署套件</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson\blog&gt; <span class="built_in">cd</span> jsgao0</div><div class="line">C:\Users\anson\blog\jsgao0&gt; npm install hexo-deployer-git --save</div></pre></td></tr></table></figure>
+<h3 id="在本地端測試有沒有建立成功"><a href="#在本地端測試有沒有建立成功" class="headerlink" title="在本地端測試有沒有建立成功"></a>在本地端測試有沒有建立成功</h3><p>hexo有提供簡易的web server讓你在本地端就能查看你準備發布的blog。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson\blog\jsgao0&gt; hexo s</div><div class="line">INFO  Start processing</div><div class="line">INFO  Hexo is running at http://localhost:4000/. Press Ctrl+C to stop.</div></pre></td></tr></table></figure>
+<p>執行之後，它會提示你網站的進入點是<em><a href="http://localhost:4000/" target="_blank" rel="external">http://localhost:4000/</a></em>。不要懷疑，打開你的瀏覽器，輸入它!</p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-hello-world.png" alt="hexo hello world!"></p>
+<h2 id="將你的部落格發佈到github"><a href="#將你的部落格發佈到github" class="headerlink" title="將你的部落格發佈到github"></a>將你的部落格發佈到github</h2><p>在本地測試完，就要發佈上去囉! 發佈之前，要先設定一些東西…</p>
+<h3 id="把你的blog在git-history裡初始化"><a href="#把你的blog在git-history裡初始化" class="headerlink" title="把你的blog在git history裡初始化"></a>把你的blog在git history裡初始化</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson\blog\jsgao0&gt; git init</div><div class="line">Initialized empty Git repository <span class="keyword">in</span> C:/Users/anson/blog/jsgao0.git/</div></pre></td></tr></table></figure>
+<h3 id="把原始碼加到Git-history裡"><a href="#把原始碼加到Git-history裡" class="headerlink" title="把原始碼加到Git history裡"></a>把原始碼加到Git history裡</h3><p>在git工具裡，是以commit為單位來記錄程式碼版本。每個commit裡面可以有很多個檔案的修改內容(新增、修改、刪除)。這邊我們要建第一個commit，這樣才能建立第一個分支(master)。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson\blog\jsgao0&gt; git add *</div><div class="line">C:\Users\anson\blog\jsgao0&gt; git commit -m <span class="string">"init"</span></div><div class="line"> 86 files changed, 5567 insertions(+)</div><div class="line"> create mode 100644 .gitignore</div><div class="line"> create mode 100644 _config.yml</div><div class="line"> create mode 100644 package.json</div><div class="line"> create mode 100644 scaffolds/draft.md</div><div class="line"> create mode 100644 scaffolds/page.md</div><div class="line"> ...</div></pre></td></tr></table></figure>
+<h3 id="設定SSH-url"><a href="#設定SSH-url" class="headerlink" title="設定SSH url"></a>設定SSH url</h3><p>到你剛剛開的Github repository首頁，點綠綠的按鈕(Clone or download)，再點右邊的<strong>Use SSH</strong>，然後把下面的連結複製起來貼到下面指令的後面。 這個步驟是要設定之後在發佈程式碼的時候的目的地(Github)。</p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-ssh-url.png" alt="Clone or download button"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson\blog\jsgao0&gt; git remote add origin ssh_url &lt;--連結貼在這裡</div><div class="line">C:\Users\anson\blog\jsgao0&gt; git remote -v // 查看有沒有設定成功</div><div class="line">origin  https://github.com/jsgao0/jsgao0.github.io.git (fetch)</div><div class="line">origin  https://github.com/jsgao0/jsgao0.github.io.git (push)</div></pre></td></tr></table></figure>
+<h3 id="把剛才新增在master分支上的commit上傳到Github"><a href="#把剛才新增在master分支上的commit上傳到Github" class="headerlink" title="把剛才新增在master分支上的commit上傳到Github"></a>把剛才新增在master分支上的commit上傳到Github</h3><p>提醒一下，這只是把程式碼傳到Github，並不是<strong>發佈</strong>部落格哦!</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson\blog\jsgao0&gt; git push origin master</div><div class="line">Counting objects: 107, done.</div><div class="line">Delta compression using up to 8 threads.</div><div class="line">Compressing objects: 100% (97/97), done.</div><div class="line">Writing objects: 100% (107/107), 520.86 KiB | 0 bytes/s, done.</div><div class="line">Total 107 (delta 0), reused 0 (delta 0)</div><div class="line">To https://github.com/jsgao0/jsgao0.github.io.git</div><div class="line"> * [new branch]      master -&gt; master</div></pre></td></tr></table></figure>
+<h3 id="發佈前的小小修改"><a href="#發佈前的小小修改" class="headerlink" title="發佈前的小小修改"></a>發佈前的小小修改</h3><p>記得剛剛我們放到Github的分支是master嗎?通常我們用git管理的時候，master是用來存放原始碼。而且，在使用name.github.io這類網址的時候，Github會自動編譯master上面的檔案，製作成網頁。</p>
+<p>在發佈到Github之前，我們必須要做些修改，讓hexo能夠產出靜態網頁並且發佈到Github上面。其實不困難，只要把剛剛的ssh url加到_config.yml就可以囉!</p>
+<p>記住: type必須為git而非github(hexo 3.0之後無效了)</p>
+<p><img src="/images/build-person-blog-using-githubpage-and-hexo-setup-master-branch.png" alt="Add ssh url and set branch as master"></p>
+<h3 id="發佈"><a href="#發佈" class="headerlink" title="發佈!"></a>發佈!</h3><p>萬事俱備了，發佈吧!</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div></pre></td><td class="code"><pre><div class="line">C:\Users\anson\blog\jsgao0&gt; hexo g</div><div class="line">INFO  Start processing</div><div class="line">INFO  Files loaded <span class="keyword">in</span> 381 ms</div><div class="line">INFO  Generated: archives/2017/04/index.html</div><div class="line">INFO  Generated: archives/2017/index.html</div><div class="line">INFO  Generated: index.html</div><div class="line">INFO  Generated: archives/index.html</div><div class="line">INFO  Generated: 2017/04/19/build-person-blog-using-githubpage-and-hexo/index.html</div><div class="line">INFO  Generated: images/logo.png</div><div class="line">INFO  Generated: images/favicon-192x192.png</div><div class="line">INFO  Generated: images/apple-touch-icon.png</div><div class="line">INFO  Generated: images/favicon.ico</div><div class="line">INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.eot</div><div class="line">INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.woff2</div><div class="line">INFO  Generated: lib/font-awesome/fonts/FontAwesome.otf</div><div class="line">INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.woff</div><div class="line">INFO  Generated: js/main.js</div><div class="line">INFO  Generated: lib/justified-gallery/jquery.justifiedGallery.min.js</div><div class="line">INFO  Generated: lib/justified-gallery/justifiedGallery.min.css</div><div class="line">INFO  Generated: lib/meslo-LG/styles.css</div><div class="line">INFO  Generated: lib/font-awesome/css/font-awesome.min.css</div><div class="line">INFO  Generated: lib/jquery/jquery.min.js</div><div class="line">INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.ttf</div><div class="line">INFO  Generated: css/style.css</div><div class="line">INFO  Generated: lib/font-awesome/css/font-awesome.css</div><div class="line">INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.svg</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGL-Italic.ttf</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGS-Italic.ttf</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGM-Italic.ttf</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGL-Bold.ttf</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGL-BoldItalic.ttf</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGM-BoldItalic.ttf</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGS-BoldItalic.ttf</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGM-Bold.ttf</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGL-Regular.ttf</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGS-Bold.ttf</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGM-Regular.ttf</div><div class="line">INFO  Generated: lib/meslo-LG/fonts/MesloLGS-Regular.ttf</div><div class="line">INFO  Generated: images/theme overview.psd</div><div class="line">INFO  36 files generated <span class="keyword">in</span> 876 ms</div><div class="line"></div><div class="line">C:\Users\anson\blog\jsgao0&gt; hexo d</div><div class="line">INFO  Deploying: git</div><div class="line">INFO  Clearing .deploy_git folder...</div><div class="line">INFO  Copying files from public folder...</div><div class="line">[master 8c80423] Site updated: 2017-04-20 16:48:17</div><div class="line"> 1 file changed, 5 insertions(+), 5 deletions(-)</div><div class="line">Branch master <span class="built_in">set</span> up to track remote branch master from git@github.com:jsgao0/jsgao0.github.io.git.</div><div class="line">To git@github.com:jsgao0/jsgao0.github.io.git</div><div class="line">   40ee5c7..8c80423  HEAD -&gt; master</div><div class="line">INFO  Deploy <span class="keyword">done</span>: git</div></pre></td></tr></table></figure>
+<h2 id="結論與心得"><a href="#結論與心得" class="headerlink" title="結論與心得"></a>結論與心得</h2><p>因為平常就有在使用npm、git和Github，所以一開始看了一些文件，花了一個多小時就搞定了。會需要花一個小時，主要是因為Windows的private key放的位置不正確，爬了許多文章才知道有固定位置。另外還花了一些時間在替換這個theme(預設的真的很陽春XD)，這部分有空再來分享怎麼替換:p。</p>
+
+  </div>
+</article>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Git"><span class="toc-number">1.</span> <span class="toc-text">Git</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安裝Git"><span class="toc-number">1.1.</span> <span class="toc-text">安裝Git</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#測試Git"><span class="toc-number">1.2.</span> <span class="toc-text">測試Git</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Github"><span class="toc-number">2.</span> <span class="toc-text">Github</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#申請Github帳號"><span class="toc-number">2.1.</span> <span class="toc-text">申請Github帳號</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#建立給部落格用的Repository"><span class="toc-number">2.2.</span> <span class="toc-text">建立給部落格用的Repository</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SSH-Keys"><span class="toc-number">2.3.</span> <span class="toc-text">SSH Keys</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#NodeJS-amp-NPM"><span class="toc-number">3.</span> <span class="toc-text">NodeJS & NPM</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安裝NodeJS-amp-NPM"><span class="toc-number">3.1.</span> <span class="toc-text">安裝NodeJS & NPM</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#測試NodeJS-amp-NPM"><span class="toc-number">3.2.</span> <span class="toc-text">測試NodeJS & NPM</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#開始建立Blog"><span class="toc-number">4.</span> <span class="toc-text">開始建立Blog!</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安裝hexo"><span class="toc-number">4.1.</span> <span class="toc-text">安裝hexo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#用hexo建立部落格"><span class="toc-number">4.2.</span> <span class="toc-text">用hexo建立部落格</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安裝hexo的佈署套件"><span class="toc-number">4.3.</span> <span class="toc-text">安裝hexo的佈署套件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#在本地端測試有沒有建立成功"><span class="toc-number">4.4.</span> <span class="toc-text">在本地端測試有沒有建立成功</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#將你的部落格發佈到github"><span class="toc-number">5.</span> <span class="toc-text">將你的部落格發佈到github</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#把你的blog在git-history裡初始化"><span class="toc-number">5.1.</span> <span class="toc-text">把你的blog在git history裡初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#把原始碼加到Git-history裡"><span class="toc-number">5.2.</span> <span class="toc-text">把原始碼加到Git history裡</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#設定SSH-url"><span class="toc-number">5.3.</span> <span class="toc-text">設定SSH url</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#把剛才新增在master分支上的commit上傳到Github"><span class="toc-number">5.4.</span> <span class="toc-text">把剛才新增在master分支上的commit上傳到Github</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#發佈前的小小修改"><span class="toc-number">5.5.</span> <span class="toc-text">發佈前的小小修改</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#發佈"><span class="toc-number">5.6.</span> <span class="toc-text">發佈!</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#結論與心得"><span class="toc-number">6.</span> <span class="toc-text">結論與心得</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&text=用Github Page和Hexo建立個人部落格"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&title=用Github Page和Hexo建立個人部落格"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&is_video=false&description=用Github Page和Hexo建立個人部落格"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=用Github Page和Hexo建立個人部落格&body=Check out this article: https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&title=用Github Page和Hexo建立個人部落格"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&title=用Github Page和Hexo建立個人部落格"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&title=用Github Page和Hexo建立個人部落格"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&title=用Github Page和Hexo建立個人部落格"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://jsgao0.github.io/2017/04/19/build-person-blog-using-githubpage-and-hexo/&name=用Github Page和Hexo建立個人部落格&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2017 jsgao0
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
+<!-- styles -->
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+<!-- jquery -->
+<script src="/lib/jquery/jquery.min.js"></script>
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-59178595-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+
