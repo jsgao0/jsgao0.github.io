@@ -195,13 +195,13 @@ To https://github.com/jsgao0/jsgao0.github.io.git
 ```
 
 ### 發佈前的小小修改
-記得剛剛我們放到Github的分支是master嗎?通常我們用git管理的時候，master是用來存放原始碼。然而，Github有個特殊的分支叫做gh-pages，這個分支是Github讓開發者在開發程式之後，除了README.md外，可以存放的靜態網頁，通常被用來當作官方網站、DEMO，而我們這次要用這個分支來做blog。
+記得剛剛我們放到Github的分支是master嗎?通常我們用git管理的時候，master是用來存放原始碼。而且，在使用name.github.io這類網址的時候，Github會自動編譯master上面的檔案，製作成網頁。
 
-在發佈到gh-pages分支之前，我們必須要做些修改，讓hexo能夠產出靜態網頁並且發佈到gh-pages上面。其實不困難，只要把剛剛的ssh url加到_config.yml就可以囉!
+在發佈到Github之前，我們必須要做些修改，讓hexo能夠產出靜態網頁並且發佈到Github上面。其實不困難，只要把剛剛的ssh url加到_config.yml就可以囉!
 
 記住: type必須為git而非github(hexo 3.0之後無效了)
 
-![Add ssh url and set branch as gh-pages](/images/build-person-blog-using-githubpage-and-hexo-setup-gh-pages-branch.png)
+![Add ssh url and set branch as master](/images/build-person-blog-using-githubpage-and-hexo-setup-master-branch.png)
 
 ### 發佈!
 萬事俱備了，發佈吧!
