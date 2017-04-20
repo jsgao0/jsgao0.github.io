@@ -96,3 +96,120 @@ C:\Users\anson> npm -v
 3.10.5
 
 ```
+
+## 開始建立Blog!
+一堆前置作業終於做完了，來開始建立Blog吧!
+
+### 安裝hexo
+這行指令是用來安裝hexo，要注意*-g*這個參數，它代表global，意思是裝到系統環境變數中，之後直接在命令提示字元視窗就能直接使用hexo的指令。
+
+``` bash
+C:\Users\anson> npm install hexo -g
+
+```
+
+### 用hexo建立部落格
+``` bash
+C:\Users\anson\> mkdir blog // 建立資料夾
+C:\Users\anson\> cd blog // 切換到blog資料夾裡面
+C:\Users\anson\blog> hexo init jsgao0 // 建立新的blog，名為jsgao0
+... // 一堆正在安裝的資訊
+INFO  Start blogging with Hexo!
+
+```
+
+### 安裝hexo的佈署套件
+``` bash
+C:\Users\anson\blog> cd jsgao0
+C:\Users\anson\blog\jsgao0> npm install hexo-deployer-git --save
+
+```
+
+### 在本地端測試有沒有建立成功
+hexo有提供簡易的web server讓你在本地端就能查看你準備發布的blog。
+
+``` bash
+C:\Users\anson\blog\jsgao0> hexo s
+INFO  Start processing
+INFO  Hexo is running at http://localhost:4000/. Press Ctrl+C to stop.
+
+```
+
+執行之後，它會提示你網站的進入點是*http://localhost:4000/*。不要懷疑，打開你的瀏覽器，輸入它!
+
+![hexo hello world!](/images/build-person-blog-using-githubpage-and-hexo-hello-world.png)
+
+## 將你的部落格發佈到github
+在本地測試完，就要發佈上去囉! 發佈之前，要先設定一些東西...
+
+### 把你的blog在git history裡初始化
+
+``` bash
+C:\Users\anson\blog\jsgao0> git init
+Initialized empty Git repository in C:/Users/anson/blog/jsgao0.git/
+
+```
+
+### 把原始碼加到Git history裡
+在git工具裡，是以commit為單位來記錄程式碼版本。每個commit裡面可以有很多個檔案的修改內容(新增、修改、刪除)。這邊我們要建第一個commit，這樣才能建立第一個分支(master)。
+
+``` bash
+C:\Users\anson\blog\jsgao0> git add *
+C:\Users\anson\blog\jsgao0> git commit -m "init"
+ 86 files changed, 5567 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 _config.yml
+ create mode 100644 package.json
+ create mode 100644 scaffolds/draft.md
+ create mode 100644 scaffolds/page.md
+ ...
+
+```
+
+### 設定SSH url
+到你剛剛開的Github repository首頁，點綠綠的按鈕(Clone or download)，再點右邊的**Use SSH**，然後把下面的連結複製起來貼到下面指令的後面。 這個步驟是要設定之後在發佈程式碼的時候的目的地(Github)。
+
+![Clone or download button](/images/build-person-blog-using-githubpage-and-hexo-ssh-url.png)
+
+``` bash
+C:\Users\anson\blog\jsgao0> git remote add origin ssh_url <--連結貼在這裡
+C:\Users\anson\blog\jsgao0> git remote -v // 查看有沒有設定成功
+origin  https://github.com/jsgao0/jsgao0.github.io.git (fetch)
+origin  https://github.com/jsgao0/jsgao0.github.io.git (push)
+
+```
+
+### 把剛才新增在master分支上的commit上傳到Github
+提醒一下，這只是把程式碼傳到Github，並不是**發佈**部落格哦!
+
+``` bash
+C:\Users\anson\blog\jsgao0> git push origin master
+Counting objects: 107, done.
+Delta compression using up to 8 threads.
+Compressing objects: 100% (97/97), done.
+Writing objects: 100% (107/107), 520.86 KiB | 0 bytes/s, done.
+Total 107 (delta 0), reused 0 (delta 0)
+To https://github.com/jsgao0/jsgao0.github.io.git
+ * [new branch]      master -> master
+
+```
+
+### 發佈前的小小修改
+記得剛剛我們放到Github的分支是master嗎?通常我們用git管理的時候，master是用來存放原始碼。然而，Github有個特殊的分支叫做gh-pages，這個分支是Github讓開發者在開發程式之後，除了README.md外，可以存放的靜態網頁，通常被用來當作官方網站、DEMO，而我們這次要用這個分支來做blog。
+
+在發佈到gh-pages分支之前，我們必須要做些修改，讓hexo能夠產出靜態網頁並且發佈到gh-pages上面。其實不困難，只要把剛剛的ssh url加到_config.yml就可以囉!
+
+記住: type必須為git而非github(hexo 3.0之後無效了)
+
+![Add ssh url and set branch as gh-pages](/images/build-person-blog-using-githubpage-and-hexo-setup-gh-pages-branch.png)
+
+### 發佈!
+萬事俱備了，發佈吧!
+
+``` bash
+C:\Users\anson\blog\jsgao0> hexo d
+
+```
+
+## 結論與心得
+因為平常就有在使用npm、git和Github，所以一開始看了一些文件，花了一個多小時就搞定了。會需要花一個小時，主要是因為Windows的private key放的位置不正確，爬了許多文章才知道有固定位置。另外還花了一些時間在替換這個theme(預設的真的很陽春XD)，這部分有空再來分享怎麼替換:p。
