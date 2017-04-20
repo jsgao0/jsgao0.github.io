@@ -207,7 +207,57 @@ To https://github.com/jsgao0/jsgao0.github.io.git
 萬事俱備了，發佈吧!
 
 ``` bash
+C:\Users\anson\blog\jsgao0> hexo g
+INFO  Start processing
+INFO  Files loaded in 381 ms
+INFO  Generated: archives/2017/04/index.html
+INFO  Generated: archives/2017/index.html
+INFO  Generated: index.html
+INFO  Generated: archives/index.html
+INFO  Generated: 2017/04/19/build-person-blog-using-githubpage-and-hexo/index.html
+INFO  Generated: images/logo.png
+INFO  Generated: images/favicon-192x192.png
+INFO  Generated: images/apple-touch-icon.png
+INFO  Generated: images/favicon.ico
+INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.eot
+INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.woff2
+INFO  Generated: lib/font-awesome/fonts/FontAwesome.otf
+INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.woff
+INFO  Generated: js/main.js
+INFO  Generated: lib/justified-gallery/jquery.justifiedGallery.min.js
+INFO  Generated: lib/justified-gallery/justifiedGallery.min.css
+INFO  Generated: lib/meslo-LG/styles.css
+INFO  Generated: lib/font-awesome/css/font-awesome.min.css
+INFO  Generated: lib/jquery/jquery.min.js
+INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.ttf
+INFO  Generated: css/style.css
+INFO  Generated: lib/font-awesome/css/font-awesome.css
+INFO  Generated: lib/font-awesome/fonts/fontawesome-webfont.svg
+INFO  Generated: lib/meslo-LG/fonts/MesloLGL-Italic.ttf
+INFO  Generated: lib/meslo-LG/fonts/MesloLGS-Italic.ttf
+INFO  Generated: lib/meslo-LG/fonts/MesloLGM-Italic.ttf
+INFO  Generated: lib/meslo-LG/fonts/MesloLGL-Bold.ttf
+INFO  Generated: lib/meslo-LG/fonts/MesloLGL-BoldItalic.ttf
+INFO  Generated: lib/meslo-LG/fonts/MesloLGM-BoldItalic.ttf
+INFO  Generated: lib/meslo-LG/fonts/MesloLGS-BoldItalic.ttf
+INFO  Generated: lib/meslo-LG/fonts/MesloLGM-Bold.ttf
+INFO  Generated: lib/meslo-LG/fonts/MesloLGL-Regular.ttf
+INFO  Generated: lib/meslo-LG/fonts/MesloLGS-Bold.ttf
+INFO  Generated: lib/meslo-LG/fonts/MesloLGM-Regular.ttf
+INFO  Generated: lib/meslo-LG/fonts/MesloLGS-Regular.ttf
+INFO  Generated: images/theme overview.psd
+INFO  36 files generated in 876 ms
+
 C:\Users\anson\blog\jsgao0> hexo d
+INFO  Deploying: git
+INFO  Clearing .deploy_git folder...
+INFO  Copying files from public folder...
+[master 8c80423] Site updated: 2017-04-20 16:48:17
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+Branch master set up to track remote branch master from git@github.com:jsgao0/jsgao0.github.io.git.
+To git@github.com:jsgao0/jsgao0.github.io.git
+   40ee5c7..8c80423  HEAD -> master
+INFO  Deploy done: git
 
 ```
 
