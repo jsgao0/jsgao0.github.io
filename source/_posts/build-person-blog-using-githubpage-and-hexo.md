@@ -2,10 +2,11 @@
 title: 用Github Page和Hexo建立個人部落格
 tags: 
     - hexo
-    - Github
+    - github
     - git
     - blog
     - node
+date: 2017-04-19 19:41:12
 ---
 因為常常看到許多大大用[Jekyll](https://jekyllrb.com/)或[Hexo](https://hexo.io/)在[Github Page](https://pages.github.com/)上建個人部落格，所以也想自己試著用Hexo做個人部落格。
 這篇會記錄從沒有任何工具一直到建立好個人部落格。

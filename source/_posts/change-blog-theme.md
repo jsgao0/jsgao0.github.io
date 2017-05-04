@@ -2,7 +2,8 @@
 title: 變更Hexo的主題
 tags: 
     - hexo
-    - Github
+    - github
+    - git
     - blog
     - theme
 date: 2017-05-04 09:41:12
