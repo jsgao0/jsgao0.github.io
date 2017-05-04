@@ -1,7 +1,9 @@
 ---
 title: 變更Hexo的主題
-tags: hexo, Github, blog, theme
+tags: 'hexo, Github, blog, theme'
+date: 2017-05-04 09:41:12
 ---
+
 繼上一篇說明如何在Github上用hexo建立blog，這次要介紹怎麼樣變更blog的主題(theme)。
 
 
