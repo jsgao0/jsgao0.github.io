@@ -18,7 +18,7 @@
 <meta property="og:image" content="https://jsgao0.github.io/images/change-blog-theme-find-repository-url.png">
 <meta property="og:image" content="https://jsgao0.github.io/images/change-blog-theme-copy-repository-url.png">
 <meta property="og:image" content="https://jsgao0.github.io/images/change-blog-theme-modify-config.png">
-<meta property="og:updated_time" content="2017-08-23T14:14:18.000Z">
+<meta property="og:updated_time" content="2017-08-23T14:33:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="變更Hexo的主題">
 <meta name="twitter:description" content="繼上一篇說明如何在Github上用hexo建立blog，這次要介紹怎麼樣變更blog的主題(theme)。 找到你喜歡的主題(Theme)Hexo官方網站有提供一些主題可以給你使用，這邊用到的主題也是官方提供的喔!  把原始碼完整的抓下來在選擇主題後，試著找到他們的Github repository連結。  接著把HTTPS的git連結複製下來。  用git clone指令把它抓下來，並放在the">
@@ -156,6 +156,11 @@
   </div>
 </article>
 
+    <div class="blog-post-comments">
+        <div id="disqus_thread"></div>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+
 
 
     </div>
@@ -255,5 +260,17 @@
     </script>
 
 <!-- Disqus Comments -->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'jsgao0';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
 
 

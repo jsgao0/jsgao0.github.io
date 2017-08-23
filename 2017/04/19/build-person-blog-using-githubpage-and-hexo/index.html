@@ -28,7 +28,7 @@
 <meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-hello-world.png">
 <meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-ssh-url.png">
 <meta property="og:image" content="https://jsgao0.github.io/images/build-person-blog-using-githubpage-and-hexo-setup-master-branch.png">
-<meta property="og:updated_time" content="2017-08-23T14:14:18.000Z">
+<meta property="og:updated_time" content="2017-08-23T14:33:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="用Github Page和Hexo建立個人部落格">
 <meta name="twitter:description" content="因為常常看到許多大大用Jekyll或Hexo在Github Page上建個人部落格，所以也想自己試著用Hexo做個人部落格。這篇會記錄從沒有任何工具一直到建立好個人部落格。 GitGit是用來管理程式碼的工具，它最主要的特性就是分散式管理(分享程式碼)。 安裝Git到Git官方網站根據你的OS(作業系統)版本下載安裝程式，然後安裝它。  測試Git搜尋一下cmd.exe，並且打開它。 接著在命令視">
@@ -217,6 +217,11 @@
   </div>
 </article>
 
+    <div class="blog-post-comments">
+        <div id="disqus_thread"></div>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+
 
 
     </div>
@@ -316,5 +321,17 @@
     </script>
 
 <!-- Disqus Comments -->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'jsgao0';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
 
 
