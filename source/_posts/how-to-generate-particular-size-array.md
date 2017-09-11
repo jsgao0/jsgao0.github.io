@@ -1,8 +1,10 @@
 ---
 title: 如何產生特定長度的陣列
 tags: 
+    - JavaScript
     - ECMA262 6.0
     - Array
+    - fill()
 date: 2017-09-09 21:59:01
 ---
 
