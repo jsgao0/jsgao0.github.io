@@ -50,7 +50,7 @@ newScript.type = 'text/javascript';
 frameDoc.head.appendChild(newScript);
 ```
 
-這邊有另外一個小問題，`document.head`這個屬性在[**IE 9**](http://caniuse.com/#feat=documenthead)以後才開始支援。 所以要做個簡單的填充工具，利用`document.getElementsByTagName()`把`head`加到`document`中。
+這邊有另外一個小問題，`document.head`這個屬性在[*IE 9*](http://caniuse.com/#feat=documenthead)以後才開始支援。 所以要做個簡單的填充工具，利用`document.getElementsByTagName()`把`head`加到`document`中。
 ``` javascript
 var frameDoc = window.frames['contentFrame'].document,
     newScript = document.createElement('script');
@@ -76,7 +76,7 @@ function _onload() {
 }
 ```
 
-問題又來了，**IE 9**之後才開始支援[**DOMContentLoaded**](http://caniuse.com/#search=onload)。 因此，可以採用`script.onreadystatechange()`作為舊版本**IE**的替代方案。
+問題又來了，*IE 9*之後才開始支援[**DOMContentLoaded**](http://caniuse.com/#search=onload)。 因此，可以採用`script.onreadystatechange()`作為舊版本**IE**的替代方案。
 ``` javascript
 var frameDoc = window.frames['contentFrame'].document,
     newScript = document.createElement('script');
