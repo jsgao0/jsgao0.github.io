@@ -17,18 +17,18 @@ date: 2017-09-12 10:26:02
 用包覆器建立的數值，型別都會是`object`；直接以原始型別指派給變數的話，其變數的型別則為對應的原始型別。
 ``` javascript
 var bool = true,
-    str = "example",
-    num = 999;
+    num = 999,
+    str = "example";
 typeof bool; // "boolean"
-typeof str; // "string"
 typeof num; // "number"
+typeof str; // "string"
 
 var boolObj = new Boolean(true),
-    strObj = new String("example"),
-    numObj = new Number(999);
+    numObj = new Number(999),
+    strObj = new String("example");
 typeof boolObj; // "object"
-typeof strObj; // "object"
 typeof numObj; // "object"
+typeof strObj; // "object"
 ```
 
 ### Boolean包覆器
@@ -89,5 +89,36 @@ var boolObjArray = [
 console.log(isSame); // true
 ``` 
 
-### String包覆器
 ### Number包覆器
+相較於`Boolean()`，`Number()`似乎就比較有用一些。 它的主要用途是作為數值判定和型別轉換，請參考 [MDN - Number#說明](https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Reference/Global_Objects/Number#說明) 。
+
+``` javascript
+Number(0) // 0
+Number(123) // 123
+Number(Infinity) // Infinity
+Number(Number.POSITIVE_INFINITY) // Infinity
+Number(Number.NEGATIVE_INFINITY) // -Infinity
+Number(Number.EPSILON) // 2.220446049250313e-16
+Number(Number.MAX_SAFE_INTEGER) // 9007199254740991
+Number(Number.MAX_VALUE) // 1.7976931348623157e+308
+Number(Number.MIN_SAFE_INTEGER) // -9007199254740991
+Number(Number.MIN_VALUE) // 5e-324
+Number(null) // 0
+Number('') // 0
+Number('123') // 123
+Number(new Date('Sep 14, 2017 23:36:45')) // 1505403405000
+Number(true) // 1
+Number(false) // 0
+Number(Boolean(true)) // 1
+Number(Boolean(false)) // 0
+
+Number(Number.NaN) // NaN
+Number(NaN) // NaN
+Number(undefined) // NaN
+Number(function(){}) // NaN
+Number({}) // NaN
+Number('123abc') // NaN
+Number(Math) // NaN
+```
+
+### String包覆器
