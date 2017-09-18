@@ -122,3 +122,25 @@ Number(Math) // NaN
 ```
 
 ### String包覆器
+`String()`如果傳入`eval()`函式的話，要特別注意。 `eval()`會把`String`物件視作是一個物件包含字串，而非一個字串。 所以要使用`valueOf()`或是`toString()`將`String`物件轉換成原始型別字串。
+
+``` javascript
+eval('5 + 5') // 10
+eval(new String('6 + 6')) // 6 + 6
+eval(new String('7 + 7').toString()) // 14
+eval(new String('8 + 8').valueOf()) // 16
+```
+
+簡單一點，其實可以多加上原始型別字串，這樣也能達到一樣的效果。
+
+``` javascript
+eval(new String('8 + 8') + '8') // 24
+```
+
+## 結論
+- 使用`new`運算子，在`typeof`的結果都會是`object`；反之，都會是自身的原始型別(`boolean`、`number`、`string`)。
+- 使用`Boolean()`時，不要用`new`運算子。
+- `Boolean()`和`!!`運算子功能相似，目的是要將物件轉換成布林值。
+- `Number()`主要功能是將可轉換成數值的物件轉換成數值，否則回傳`NaN`物件。
+- `Number()`可將`Date`物件轉換成時間戳記。
+- `String()`在使用時，要注意在`eval()`中，需要做原始型別字串的轉換，否則會達不到預期的結果。
