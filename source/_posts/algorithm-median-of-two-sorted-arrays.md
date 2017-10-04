@@ -150,4 +150,4 @@ var findMedianSortedArrays = function(nums1, nums2) {
 我根本來亂的... 照常理，我的算法時間複雜度應該是`O(n)`。 感覺可以再加入二分法再做一些優化，有時間再來好好改善一下。
 
 ## 參考資料
-[LeetCode - Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/description/)
+[LeetCode - 4. Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/description/)
