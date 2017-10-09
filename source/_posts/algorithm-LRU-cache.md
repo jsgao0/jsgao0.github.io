@@ -27,8 +27,7 @@ lru.put(2, 20); // 快取: 4(40), 3(30), 2(20)
 乍看之下，用一個 `Array` 搭配 `Array.prototype.find()` 應該就可以解決。 但 `Array.prototype.find()` 的時間複雜度是 `O(n)` ，並不是我要的 `O(1)` 。 於是乎，去 `LeetCode` 的討論區爬到了一個解法，用 [`HashTable + DoubleLinkedList`](https://discuss.leetcode.com/topic/6613/java-hashtable-double-linked-list-with-a-touch-of-pseudo-nodes/23) 實作。
 
 ### 雜湊表 - HashTable
-雜湊表是一個映射表，可以透過唯一的鍵值(key)，查詢表中所對應的資料(value)。 然而，因為是一個鍵值對應的關係，在查找的時候，時間複雜度只需要
- `O(1)`。 因此，採用雜湊表的目的，是要來管理目前快取裡面存在的值，無論新增、修改、刪除都能夠以 `O(1)` 的時間複雜度完成。 
+雜湊表是一個映射表，可以透過唯一的鍵值(key)，查詢表中所對應的資料(value)。 然而，因為是一個鍵值對應的關係，在查找的時候，時間複雜度只需要 `O(1)`。 因此，採用雜湊表的目的，是要來管理目前快取裡面存在的值，無論新增、修改、刪除都能夠以 `O(1)` 的時間複雜度完成。 
 
 
 ### 雙向連結串列 - Double Linked List
@@ -175,7 +174,6 @@ var LRUCache = function(capacity) {
 ```
 
 ### 實作2 - put函式
-實作這個函式需要注意的地方，是
 
 ``` javascript
 LRUCache.prototype.put = function(key, value) {
