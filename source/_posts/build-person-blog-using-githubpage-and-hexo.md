@@ -49,7 +49,7 @@ Github的[首頁](https://github.com/)就是註冊頁，填完資料、驗證完
 ![Create repository page](/images/build-person-blog-using-githubpage-and-hexo-create-new-github-repository-page.png)
 
 ### SSH Keys
-嗯... 這個事幹嘛的? 跟Github有啥關係?
+嗯... 這個是幹嘛的? 跟Github有啥關係?
 
 <blockquote>
   SSH是目前較可靠，專為遠端登入對談和其他網路服務提供安全性的協定。
