@@ -6,7 +6,7 @@
     "version": "6.2.0"
   },
   "scripts": {
-    "add": "hexo new",
+    "add-draft": "hexo new draft",
     "start": "hexo server",
     "build": "hexo generate",
     "deploy": "hexo deploy",
