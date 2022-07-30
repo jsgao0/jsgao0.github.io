@@ -8,6 +8,7 @@
   "scripts": {
     "add-draft": "hexo new draft",
     "start": "hexo server",
+    "start-draft": "hexo server --draft",
     "build": "hexo generate",
     "deploy": "hexo deploy",
     "clean": "hexo clean",
