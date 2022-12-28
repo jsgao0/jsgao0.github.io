@@ -1,13 +1,14 @@
 ---
 title: Redux-Saga - redux-saga-test-plan 測試範例
 tags:
-	- Redux
-	- Redux-Saga
-	- redux-saga-test-plan
-	- unit-test
-	- integration-test
+  - Redux
+  - Redux-Saga
+  - redux-saga-test-plan
+  - unit-test
+  - integration-test
 date: 2022-10-01 17:03:00
 ---
+
 
 最近在專案中第一次使用 redux-saga ，對一個 saga 寫測試的時候，看到既有的一些 saga 測試使用 [redux-saga-test-plan](https://github.com/jfairbank/redux-saga-test-plan)。在閱讀文件的範例過程中，把 `testSaga` 和 `expectSaga` 兩個測試用法搞糊塗，於是仔細地讀了裡面的說明。兩者的差別如下：
 
@@ -189,3 +190,71 @@ it('test loadUserInfo', () => {
 1. 會影響結果的 effect 都要測試到
 2. 只需要 mock saga 在執行每一個 effect 的結果
 3. 用 `.provide()` 可以 mock [固定的 effect 結果](https://redux-saga-test-plan.jeremyfairbank.com/integration-testing/mocking/static-providers.html)，也可以 mock [動態的結果](https://redux-saga-test-plan.jeremyfairbank.com/integration-testing/mocking/dynamic-providers.html)
+4. 最後再執行 `.run()` 
+
+下面是官方範例：
+
+``` javascript
+import { call, put, take } from 'redux-saga/effects';
+import { expectSaga } from 'redux-saga-test-plan';
+import * as matchers from 'redux-saga-test-plan/matchers';
+import { throwError } from 'redux-saga-test-plan/providers';
+import api from 'my-api';
+
+// 要測試的 saga
+function* userSaga(api) {
+  try {
+    const action = yield take('REQUEST_USER');
+    const user = yield call(api.fetchUser, action.payload);
+    const pet = yield call(api.fetchPet, user.petId);
+
+    yield put({
+      type: 'RECEIVE_USER',
+      payload: { user, pet },
+    });
+  } catch (e) {
+    yield put({ type: 'FAIL_USER', error: e });
+  }
+}
+
+it('fetches the user', () => {
+	// 假資料
+  const fakeUser = { name: 'Jeremy', petId: 20 };
+  const fakeDog = { name: 'Tucker' };
+
+  return expectSaga(userSaga, api)
+	  // mocked api calls with result
+    .provide([
+      [call(api.fetchUser, 42), fakeUser],
+      [matchers.call.fn(api.fetchPet), fakeDog],
+    ])
+		// mocked side effect
+    .put({ 
+      type: 'RECEIVE_USER',
+      payload: { user: fakeUser, pet: fakeDog },
+    })
+		// 觸發 saga 
+    .dispatch({ type: 'REQUEST_USER', payload: 42 })
+    .run();
+});
+
+it('handles errors', () => {
+	// 假資料
+  const error = new Error('error');
+
+  return expectSaga(userSaga, api)
+		// mocked api call with result
+    .provide([
+      [matchers.call.fn(api.fetchUser), throwError(error)]
+    ])
+		// mocked side effect
+    .put({ type: 'FAIL_USER', error })
+		// 觸發 saga 
+    .dispatch({ type: 'REQUEST_USER', payload: 42 })
+    .run();
+});
+```
+
+## 結論
+1. `testSaga` 目的在於 branching 是否如預期
+2. `expectSaga` 目的在於結果是否如預期
