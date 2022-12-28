@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="上圖摘自： [Page Lifecycle API](https:&#x2F;&#x2F;developer.chrome.com&#x2F;blog&#x2F;page-lifecycle-api&#x2F;#overview-of-page-lifecycle-states-and-events)  緣由前陣子遇到一個平常很常遇到，但是真的發生在自己的應用上卻不知如何解決的現象: Frozen state 。因為遇到的狀況很特別，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="browser-page-lifecycle">
+<meta property="og:url" content="https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/index.html">
+<meta property="og:site_name" content="Anson Keeps">
+<meta property="og:description" content="上圖摘自： [Page Lifecycle API](https:&#x2F;&#x2F;developer.chrome.com&#x2F;blog&#x2F;page-lifecycle-api&#x2F;#overview-of-page-lifecycle-states-and-events)  緣由前陣子遇到一個平常很常遇到，但是真的發生在自己的應用上卻不知如何解決的現象: Frozen state 。因為遇到的狀況很特別，">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/page-lifecycle.svg">
+<meta property="article:published_time" content="2022-12-28T15:13:00.000Z">
+<meta property="article:modified_time" content="2022-12-28T15:58:43.419Z">
+<meta property="article:author" content="jsgao0">
+<meta property="article:tag" content="Browser">
+<meta property="article:tag" content="History">
+<meta property="article:tag" content="Page lifecycle">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/page-lifecycle.svg">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>browser-page-lifecycle</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- rss -->
+    
+    
+    <script type="text/javascript">
+      (function(p,u,s,h){
+          p._pcq=p._pcq||[];
+          p._pcq.push(['_currentTime',Date.now()]);
+          s=u.createElement('script');
+          s.type='text/javascript';
+          s.async=true;
+          s.src='https://cdn.pushcrew.com/js/2c18bacb4fd640e524a708622ef07f92.js';
+          h=u.getElementsByTagName('script')[0];
+          h.parentNode.insertBefore(s,h);
+      })(window,document);
+    </script>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-59178595-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'jsgao0';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2022/10/01/redux-saga-and-testing/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&text=browser-page-lifecycle"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&title=browser-page-lifecycle"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&is_video=false&description=browser-page-lifecycle"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=browser-page-lifecycle&body=Check out this article: https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&title=browser-page-lifecycle"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&title=browser-page-lifecycle"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&title=browser-page-lifecycle"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&title=browser-page-lifecycle"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&name=browser-page-lifecycle&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B7%A3%E7%94%B1"><span class="toc-number">1.</span> <span class="toc-text">緣由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BE%8C%E7%BA%8C"><span class="toc-number">3.</span> <span class="toc-text">後續</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        browser-page-lifecycle
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Anson Keeps</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2022-12-28T15:13:00.000Z" itemprop="datePublished">2022-12-28</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Browser/" rel="tag">Browser</a>, <a class="tag-link-link" href="/tags/History/" rel="tag">History</a>, <a class="tag-link-link" href="/tags/Page-lifecycle/" rel="tag">Page lifecycle</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <a href="page-lifecycle.svg" target="_blank">
+  <img src="page-lifecycle.svg" style="background-color: white; max-width: 100vw; width: 150%; margin-left: -25%;"/>
+</a>
+上圖摘自： [Page Lifecycle API](https://developer.chrome.com/blog/page-lifecycle-api/#overview-of-page-lifecycle-states-and-events)
+
+<h2 id="緣由"><a href="#緣由" class="headerlink" title="緣由"></a>緣由</h2><p>前陣子遇到一個平常很常遇到，但是真的發生在自己的應用上卻不知如何解決的現象: <code>Frozen state</code> 。因為遇到的狀況很特別，</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>當下猜測是因為 shallow routing 在往下一個 route path 的時候，沒有清除前一個頁面的 form state 所導致。在找到 <a target="_blank" rel="noopener" href="https://developer.chrome.com/blog/page-lifecycle-api/#overview-of-page-lifecycle-states-and-events">Page Lifecycle API</a> 這篇文章之前，曾到 Google 搜尋 <code>clear form state</code>, <code>reset form state</code> 諸如此類的關鍵字，都找不到解決方式。直到我退一步想，若不能清除 form state ，那就乾脆清除 page state。因此，就找到上面這篇文章。</p>
+<p>在看了文章的狀態圖和 <a target="_blank" rel="noopener" href="https://developer.chrome.com/blog/page-lifecycle-api/#states">States</a> 之後，在心中篤信是 shallow routing 造成。索性就用 <code>window.location.href</code> 來取代 <code>$router.push()</code> 。</p>
+<p>結果：成功</p>
+<h2 id="後續"><a href="#後續" class="headerlink" title="後續"></a>後續</h2><p>若仔細看文章後半部的 <a target="_blank" rel="noopener" href="https://developer.chrome.com/blog/page-lifecycle-api/#states">Testing your app in the frozen and discarded states
+</a> ，就可以看到有查到 Page state 的 chrome 內建頁面 chrome:&#x2F;&#x2F;discards&#x2F; 。下次若再遇到的話，再來試試看。</p>
+
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+    </div>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B7%A3%E7%94%B1"><span class="toc-number">1.</span> <span class="toc-text">緣由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">2.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BE%8C%E7%BA%8C"><span class="toc-number">3.</span> <span class="toc-text">後續</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&text=browser-page-lifecycle"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&title=browser-page-lifecycle"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&is_video=false&description=browser-page-lifecycle"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=browser-page-lifecycle&body=Check out this article: https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&title=browser-page-lifecycle"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&title=browser-page-lifecycle"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&title=browser-page-lifecycle"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&title=browser-page-lifecycle"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jsgao0.github.io/2022/12/28/browser-page-lifecycle/&name=browser-page-lifecycle&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2022 jsgao0
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
