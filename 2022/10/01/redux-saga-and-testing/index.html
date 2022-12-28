@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="最近在專案中第一次使用 redux-saga ，對一個 saga 寫測試的時候，看到既有的一些 saga 測試使用 redux-saga-test-plan。在閱讀文件的範例過程中，把 testSaga 和 expectSaga 兩個測試用法搞糊塗，於是仔細地讀了裡面的說明。兩者的差別如下：  testSaga: 在乎 saga 的順序、每一個被 yield 的 effect 樣貌對不對。 exp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redux-Saga - redux-saga-test-plan 測試範例">
+<meta property="og:url" content="https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/index.html">
+<meta property="og:site_name" content="Anson Keeps">
+<meta property="og:description" content="最近在專案中第一次使用 redux-saga ，對一個 saga 寫測試的時候，看到既有的一些 saga 測試使用 redux-saga-test-plan。在閱讀文件的範例過程中，把 testSaga 和 expectSaga 兩個測試用法搞糊塗，於是仔細地讀了裡面的說明。兩者的差別如下：  testSaga: 在乎 saga 的順序、每一個被 yield 的 effect 樣貌對不對。 exp">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2022-10-01T09:03:00.000Z">
+<meta property="article:modified_time" content="2022-12-28T15:08:17.156Z">
+<meta property="article:author" content="jsgao0">
+<meta property="article:tag" content="Redux">
+<meta property="article:tag" content="unit-test">
+<meta property="article:tag" content="integration-test">
+<meta property="article:tag" content="Redux-Saga">
+<meta property="article:tag" content="redux-saga-test-plan">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Redux-Saga - redux-saga-test-plan 測試範例</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- rss -->
+    
+    
+    <script type="text/javascript">
+      (function(p,u,s,h){
+          p._pcq=p._pcq||[];
+          p._pcq.push(['_currentTime',Date.now()]);
+          s=u.createElement('script');
+          s.type='text/javascript';
+          s.async=true;
+          s.src='https://cdn.pushcrew.com/js/2c18bacb4fd640e524a708622ef07f92.js';
+          h=u.getElementsByTagName('script')[0];
+          h.parentNode.insertBefore(s,h);
+      })(window,document);
+    </script>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-59178595-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'jsgao0';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2022/07/30/react-js-main-concepts-jsx/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&text=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&title=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&is_video=false&description=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Redux-Saga - redux-saga-test-plan 測試範例&body=Check out this article: https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&title=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&title=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&title=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&title=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&name=Redux-Saga - redux-saga-test-plan 測試範例&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E7%AF%84%E4%BE%8B%E8%AA%AA%E6%98%8E"><span class="toc-number">1.</span> <span class="toc-text">利用範例說明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#testSaga-%E7%94%A8%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">testSaga 用法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#expectSaga-%E7%94%A8%E6%B3%95"><span class="toc-number">3.</span> <span class="toc-text">expectSaga 用法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-number">4.</span> <span class="toc-text">結論</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Redux-Saga - redux-saga-test-plan 測試範例
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Anson Keeps</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2022-10-01T09:03:00.000Z" itemprop="datePublished">2022-10-01</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Redux/" rel="tag">Redux</a>, <a class="tag-link-link" href="/tags/Redux-Saga/" rel="tag">Redux-Saga</a>, <a class="tag-link-link" href="/tags/integration-test/" rel="tag">integration-test</a>, <a class="tag-link-link" href="/tags/redux-saga-test-plan/" rel="tag">redux-saga-test-plan</a>, <a class="tag-link-link" href="/tags/unit-test/" rel="tag">unit-test</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>最近在專案中第一次使用 redux-saga ，對一個 saga 寫測試的時候，看到既有的一些 saga 測試使用 <a target="_blank" rel="noopener" href="https://github.com/jfairbank/redux-saga-test-plan">redux-saga-test-plan</a>。在閱讀文件的範例過程中，把 <code>testSaga</code> 和 <code>expectSaga</code> 兩個測試用法搞糊塗，於是仔細地讀了裡面的說明。兩者的差別如下：</p>
+<ol>
+<li><code>testSaga</code>: 在乎 saga 的順序、每一個被 yield 的 effect 樣貌對不對。</li>
+<li><code>expectSaga</code>: 在乎 saga 的結果對不對。</li>
+</ol>
+<h2 id="利用範例說明"><a href="#利用範例說明" class="headerlink" title="利用範例說明"></a>利用範例說明</h2><p>下面的範例是在描述用戶在登入成功時，要接著去把用戶資訊拉回來，更新到 redux store 的 state 裡面。</p>
+<p><code>sagas/auth/selectors.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="title function_">getToken</span> = state =&gt; state.<span class="property">auth</span>.<span class="property">token</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>sagas/auth/actions.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="variable constant_">LOGIN_SUCCESSFULLY</span> = <span class="string">&#x27;LOGIN_SUCCESSFULLY&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>sagas/user/actions.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="variable constant_">RESET_USER_INFO</span> = <span class="string">&#x27;RESET_USER_INFO&#x27;</span>;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="variable constant_">SET_USER_INFO</span> = <span class="string">&#x27;SET_USER_INFO&#x27;</span>;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="variable constant_">LOAD_USER_INFO_ERROR</span> = <span class="string">&#x27;LOAD_USER_INFO_ERROR&#x27;</span><span class="string">&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>sagas/user/reducers.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="variable constant_">RESET_USER_INFO</span>, <span class="variable constant_">SET_USER_INFO</span>, <span class="variable constant_">LOAD_USER_INFO_ERROR</span> &#125; <span class="keyword">from</span> <span class="string">&#x27;./actions&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> initialState = &#123;</span><br><span class="line">	<span class="attr">info</span>: <span class="literal">null</span>,</span><br><span class="line">	<span class="attr">error</span>: <span class="literal">null</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">function</span> (<span class="params">state = initialState, action</span>) &#123;</span><br><span class="line">	<span class="keyword">switch</span>(action.<span class="property">type</span>) &#123;</span><br><span class="line">		<span class="keyword">case</span> <span class="attr">RESET_USER_INFO</span>:</span><br><span class="line">			<span class="keyword">return</span> <span class="title class_">Object</span>.<span class="title function_">assign</span>(&#123;&#125;, state, &#123;</span><br><span class="line">				<span class="attr">info</span>: <span class="literal">null</span>,</span><br><span class="line">				<span class="attr">error</span>: <span class="literal">null</span></span><br><span class="line">			&#125;);</span><br><span class="line">		<span class="keyword">case</span> <span class="attr">SET_USER_INFO</span>:</span><br><span class="line">			<span class="keyword">return</span> <span class="title class_">Object</span>.<span class="title function_">assign</span>(&#123;&#125;, state, &#123;</span><br><span class="line">				<span class="attr">info</span>: action.<span class="property">payload</span></span><br><span class="line">			&#125;);</span><br><span class="line">		<span class="keyword">case</span> <span class="attr">LOAD_USER_INFO_ERROR</span>:</span><br><span class="line">			<span class="keyword">return</span> <span class="title class_">Object</span>.<span class="title function_">assign</span>(&#123;&#125;, state, &#123;</span><br><span class="line">				<span class="attr">error</span>: action.<span class="property">payload</span></span><br><span class="line">			&#125;);</span><br><span class="line">		<span class="attr">default</span>:</span><br><span class="line">			<span class="keyword">return</span> state;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>sagas/user/index.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; takeLatest, select &#125; <span class="keyword">from</span> <span class="string">&#x27;redux-saga/effects&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> actions <span class="keyword">from</span> <span class="string">&#x27;./actions&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> authActions <span class="keyword">from</span> <span class="string">&#x27;../auth/actions&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; getToken &#125; <span class="keyword">from</span> <span class="string">&#x27;../auth/selectors&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> fetchUserInfoError = <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&#x27;token is needed&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="title function_">fetchUserInfo</span> = <span class="keyword">async</span> (<span class="params">token</span>) =&gt; &#123;</span><br><span class="line">	<span class="keyword">if</span> (token == <span class="literal">null</span>) <span class="keyword">throw</span> fetchUserInfoError;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">const</span> result = <span class="title function_">fetch</span>(<span class="string">&#x27;https://api-url.com/user&#x27;</span>, &#123;</span><br><span class="line">		<span class="attr">headers</span>: &#123;</span><br><span class="line">			<span class="string">&#x27;Authorization&#x27;</span>: token,</span><br><span class="line">			<span class="string">&#x27;Accept&#x27;</span>: <span class="string">&#x27;application/json&#x27;</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;).<span class="title function_">then</span>(<span class="function"><span class="params">response</span> =&gt;</span> response.<span class="title function_">json</span>());</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> result;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">function</span>* <span class="title function_">loadUserInfo</span>(<span class="params"></span>) &#123;</span><br><span class="line">	<span class="keyword">const</span> token = <span class="keyword">yield</span> <span class="title function_">select</span>(<span class="function"><span class="params">state</span> =&gt;</span> state.<span class="property">auth</span>.<span class="property">token</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">yield</span> <span class="title function_">put</span>(&#123; <span class="attr">type</span>: actions.<span class="property">RESET_USER_INFO</span> &#125;);</span><br><span class="line">		<span class="keyword">const</span> userInfo = <span class="keyword">yield</span> <span class="title function_">call</span>(fetchUserInfo, token);</span><br><span class="line">		<span class="keyword">yield</span> <span class="title function_">put</span>(&#123; <span class="attr">type</span>: actions.<span class="property">SET_USER_INFO</span>, <span class="attr">payload</span>: userInfo &#125;);</span><br><span class="line">	&#125; <span class="keyword">catch</span>(e) &#123;</span><br><span class="line">		<span class="keyword">yield</span> <span class="title function_">put</span>(&#123; <span class="attr">type</span>: actions.<span class="property">LOAD_USER_INFO_ERROR</span>, <span class="attr">payload</span>: e &#125;);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">function</span>* <span class="title function_">saga</span>(<span class="params"></span>) &#123;</span><br><span class="line">	<span class="keyword">yield</span> <span class="title function_">takeLatest</span>(authActions.<span class="property">LOGIN_SUCCESSFULLY</span>, loadUserInfo);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="testSaga-用法"><a href="#testSaga-用法" class="headerlink" title="testSaga 用法"></a>testSaga 用法</h2><p>因為需要確保 saga 的執行順序，以及每一個被 yield 的 effect 如同預期，所以用法有幾個原則：</p>
+<ol>
+<li>先執行 <code>testSaga(saga, ...args)</code></li>
+<li>再按照順序執行 effects ，每一個 effect 執行之前都要先做 <code>.next()</code> 到達當前的 effect</li>
+<li>最後要執行 <code>.isDone()</code> ，看看這個 saga 是否已經執行完畢</li>
+</ol>
+<p>下面的程式碼分別針對 <code>saga()</code> 和 <code>loadUserInfo</code> 兩個 saga 做測試，很單純地只是在測試運作的順序有沒有按照預期那樣而已。如果把 <code>loadUserInfo</code> 的測試範圍涵蓋到 error 的情況，就必須要開不同的 <code>testSaga</code> 去驗證，可參考官方文件的<a target="_blank" rel="noopener" href="https://redux-saga-test-plan.jeremyfairbank.com/unit-testing/">範例</a>。</p>
+<p><code>sagas/user.spec.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; testSaga &#125; <span class="keyword">from</span> <span class="string">&#x27;redux-saga-test-plan&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> mainSaga, &#123; fetchUserInfoError, fetchUserInfo, loadUserInfo &#125; <span class="keyword">from</span> <span class="string">&#x27;./user&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> actions <span class="keyword">from</span> <span class="string">&#x27;./user/actions&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; getToken &#125; <span class="keyword">from</span> <span class="string">&#x27;./auth/selectors&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> authActions <span class="keyword">from</span> <span class="string">&#x27;./auth/actions&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_">it</span>(<span class="string">&#x27;test mainSaga&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">	<span class="title function_">testSaga</span>(mainSaga)</span><br><span class="line">		.<span class="title function_">next</span>()</span><br><span class="line">		</span><br><span class="line">		.<span class="title function_">takeLatest</span>(authActions.<span class="property">LOGIN_SUCCESSFULLY</span>, loadUserInfo)</span><br><span class="line"></span><br><span class="line">		.<span class="title function_">next</span>()</span><br><span class="line">		</span><br><span class="line">		.<span class="title function_">isDone</span>();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="title function_">it</span>(<span class="string">&#x27;test loadUserInfo&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">	<span class="keyword">const</span> fakeToken = <span class="literal">undefined</span>;</span><br><span class="line">	<span class="keyword">const</span> fakeUserInfo = <span class="literal">undefined</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 測試成功的步驟</span></span><br><span class="line">	<span class="title function_">testSaga</span>(loadUserInfo)</span><br><span class="line">		<span class="comment">// 開始 saga 的執行步驟</span></span><br><span class="line">		.<span class="title function_">next</span>()</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 驗證 saga yield 的 effect 是否和 `select` 這個傳入 selector 的 effect 相同</span></span><br><span class="line">		.<span class="title function_">select</span>(getToken)</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 直接走到下一個 yield 的 effect</span></span><br><span class="line">		.<span class="title function_">next</span>()</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 驗證 saga yield 的 effect 是否和 `put` 這個傳入 action 的 effect 相同</span></span><br><span class="line">		.<span class="title function_">put</span>(&#123; <span class="attr">type</span>: actions.<span class="property">RESET_USER_INFO</span> &#125;)</span><br><span class="line"></span><br><span class="line">		.<span class="title function_">next</span>()</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 驗證 saga yield 的 effect 是否和 `call` 這個傳入 function 和傳入參數的 effect 相同</span></span><br><span class="line">		.<span class="title function_">call</span>(fetchUserInfo, fakeToken)</span><br><span class="line"></span><br><span class="line">		.<span class="title function_">next</span>()</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 驗證 saga yield 的 effect 是否和 `put` 這個傳入 action 的 effect 相同</span></span><br><span class="line">		.<span class="title function_">put</span>(&#123; <span class="attr">type</span>: actions.<span class="property">SET_USER_INFO</span>, <span class="attr">payload</span>: fakeUserInfo &#125;)</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 驗證 saga 是否已經完成</span></span><br><span class="line">		.<span class="title function_">isDone</span>();</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 測試發生錯誤的步驟</span></span><br><span class="line">	<span class="title function_">testSaga</span>(loadUserInfo)</span><br><span class="line">		.<span class="title function_">next</span>()</span><br><span class="line">		.<span class="title function_">select</span>(getToken)</span><br><span class="line">		.<span class="title function_">next</span>()</span><br><span class="line">		.<span class="title function_">put</span>(&#123; <span class="attr">type</span>: actions.<span class="property">RESET_USER_INFO</span> &#125;)</span><br><span class="line">		.<span class="title function_">next</span>()</span><br><span class="line">		.<span class="title function_">call</span>(fetchUserInfo, fakeToken)</span><br><span class="line">		.<span class="title function_">next</span>()</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 這邊開始不一樣</span></span><br><span class="line">		.<span class="keyword">throw</span>(fetchUserInfoError)</span><br><span class="line">		.<span class="title function_">put</span>(&#123; <span class="attr">type</span>: <span class="variable constant_">LOAD_USER_INFO_ERROR</span>, <span class="attr">payload</span>: fetchUserInfoError &#125;)</span><br><span class="line">		.<span class="title function_">next</span>()</span><br><span class="line">		.<span class="title function_">isDone</span>();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="expectSaga-用法"><a href="#expectSaga-用法" class="headerlink" title="expectSaga 用法"></a>expectSaga 用法</h2><p>在使用 <code>expectSaga</code> 的時候，因為目的是要確保模擬的輸入參數、設定的情境，產出的結果能夠符合預期。因此，用法上有幾個原則：</p>
+<ol>
+<li>會影響結果的 effect 都要測試到</li>
+<li>只需要 mock saga 在執行每一個 effect 的結果</li>
+<li>用 <code>.provide()</code> 可以 mock <a target="_blank" rel="noopener" href="https://redux-saga-test-plan.jeremyfairbank.com/integration-testing/mocking/static-providers.html">固定的 effect 結果</a>，也可以 mock <a target="_blank" rel="noopener" href="https://redux-saga-test-plan.jeremyfairbank.com/integration-testing/mocking/dynamic-providers.html">動態的結果</a></li>
+<li>最後再執行 <code>.run()</code></li>
+</ol>
+<p>下面是官方範例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; call, put, take &#125; <span class="keyword">from</span> <span class="string">&#x27;redux-saga/effects&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; expectSaga &#125; <span class="keyword">from</span> <span class="string">&#x27;redux-saga-test-plan&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> * <span class="keyword">as</span> matchers <span class="keyword">from</span> <span class="string">&#x27;redux-saga-test-plan/matchers&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; throwError &#125; <span class="keyword">from</span> <span class="string">&#x27;redux-saga-test-plan/providers&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> api <span class="keyword">from</span> <span class="string">&#x27;my-api&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 要測試的 saga</span></span><br><span class="line"><span class="keyword">function</span>* <span class="title function_">userSaga</span>(<span class="params">api</span>) &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> action = <span class="keyword">yield</span> <span class="title function_">take</span>(<span class="string">&#x27;REQUEST_USER&#x27;</span>);</span><br><span class="line">    <span class="keyword">const</span> user = <span class="keyword">yield</span> <span class="title function_">call</span>(api.<span class="property">fetchUser</span>, action.<span class="property">payload</span>);</span><br><span class="line">    <span class="keyword">const</span> pet = <span class="keyword">yield</span> <span class="title function_">call</span>(api.<span class="property">fetchPet</span>, user.<span class="property">petId</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">yield</span> <span class="title function_">put</span>(&#123;</span><br><span class="line">      <span class="attr">type</span>: <span class="string">&#x27;RECEIVE_USER&#x27;</span>,</span><br><span class="line">      <span class="attr">payload</span>: &#123; user, pet &#125;,</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    <span class="keyword">yield</span> <span class="title function_">put</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;FAIL_USER&#x27;</span>, <span class="attr">error</span>: e &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">it</span>(<span class="string">&#x27;fetches the user&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">	<span class="comment">// 假資料</span></span><br><span class="line">  <span class="keyword">const</span> fakeUser = &#123; <span class="attr">name</span>: <span class="string">&#x27;Jeremy&#x27;</span>, <span class="attr">petId</span>: <span class="number">20</span> &#125;;</span><br><span class="line">  <span class="keyword">const</span> fakeDog = &#123; <span class="attr">name</span>: <span class="string">&#x27;Tucker&#x27;</span> &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">expectSaga</span>(userSaga, api)</span><br><span class="line">	  <span class="comment">// mocked api calls with result</span></span><br><span class="line">    .<span class="title function_">provide</span>([</span><br><span class="line">      [<span class="title function_">call</span>(api.<span class="property">fetchUser</span>, <span class="number">42</span>), fakeUser],</span><br><span class="line">      [matchers.<span class="property">call</span>.<span class="title function_">fn</span>(api.<span class="property">fetchPet</span>), fakeDog],</span><br><span class="line">    ])</span><br><span class="line">		<span class="comment">// mocked side effect</span></span><br><span class="line">    .<span class="title function_">put</span>(&#123; </span><br><span class="line">      <span class="attr">type</span>: <span class="string">&#x27;RECEIVE_USER&#x27;</span>,</span><br><span class="line">      <span class="attr">payload</span>: &#123; <span class="attr">user</span>: fakeUser, <span class="attr">pet</span>: fakeDog &#125;,</span><br><span class="line">    &#125;)</span><br><span class="line">		<span class="comment">// 觸發 saga </span></span><br><span class="line">    .<span class="title function_">dispatch</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;REQUEST_USER&#x27;</span>, <span class="attr">payload</span>: <span class="number">42</span> &#125;)</span><br><span class="line">    .<span class="title function_">run</span>();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="title function_">it</span>(<span class="string">&#x27;handles errors&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">	<span class="comment">// 假資料</span></span><br><span class="line">  <span class="keyword">const</span> error = <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&#x27;error&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="title function_">expectSaga</span>(userSaga, api)</span><br><span class="line">		<span class="comment">// mocked api call with result</span></span><br><span class="line">    .<span class="title function_">provide</span>([</span><br><span class="line">      [matchers.<span class="property">call</span>.<span class="title function_">fn</span>(api.<span class="property">fetchUser</span>), <span class="title function_">throwError</span>(error)]</span><br><span class="line">    ])</span><br><span class="line">		<span class="comment">// mocked side effect</span></span><br><span class="line">    .<span class="title function_">put</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;FAIL_USER&#x27;</span>, error &#125;)</span><br><span class="line">		<span class="comment">// 觸發 saga </span></span><br><span class="line">    .<span class="title function_">dispatch</span>(&#123; <span class="attr">type</span>: <span class="string">&#x27;REQUEST_USER&#x27;</span>, <span class="attr">payload</span>: <span class="number">42</span> &#125;)</span><br><span class="line">    .<span class="title function_">run</span>();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><ol>
+<li><code>testSaga</code> 目的在於 branching 是否如預期</li>
+<li><code>expectSaga</code> 目的在於結果是否如預期</li>
+</ol>
+
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+    </div>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E7%AF%84%E4%BE%8B%E8%AA%AA%E6%98%8E"><span class="toc-number">1.</span> <span class="toc-text">利用範例說明</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#testSaga-%E7%94%A8%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">testSaga 用法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#expectSaga-%E7%94%A8%E6%B3%95"><span class="toc-number">3.</span> <span class="toc-text">expectSaga 用法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B5%90%E8%AB%96"><span class="toc-number">4.</span> <span class="toc-text">結論</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&text=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&title=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&is_video=false&description=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Redux-Saga - redux-saga-test-plan 測試範例&body=Check out this article: https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&title=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&title=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&title=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&title=Redux-Saga - redux-saga-test-plan 測試範例"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jsgao0.github.io/2022/10/01/redux-saga-and-testing/&name=Redux-Saga - redux-saga-test-plan 測試範例&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2022 jsgao0
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
