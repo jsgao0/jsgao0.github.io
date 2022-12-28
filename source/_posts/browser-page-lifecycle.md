@@ -1,10 +1,9 @@
 ---
-title: browser-page-lifecycle
+title: Browser Page Lifecycle
 tags:
   - Browser
   - History
   - Page lifecycle
-  - null
 date: 2022-12-28 23:13:00
 ---
 
