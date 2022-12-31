@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="緣由前陣子在設計某項功能，這個功能需要將每個人在資料庫的上下班打卡紀錄，計算成工作時數。我們本來使用非常簡易的演算法，將資料預想成是一組、一組完美的上下班打卡記錄，逐一計算出每個人的工作時數： 假設資料表的資料如下：    ROW_NUMBER EMP_NO FLAG LOG_TIME    1 a00001 CHECK_IN 2022-06-01T07:59:02.000Z   2 a00002">
+<meta property="og:type" content="article">
+<meta property="og:title" content="刪除連續的上班紀錄或是連續的下班紀錄">
+<meta property="og:url" content="https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/index.html">
+<meta property="og:site_name" content="Anson Keeps">
+<meta property="og:description" content="緣由前陣子在設計某項功能，這個功能需要將每個人在資料庫的上下班打卡紀錄，計算成工作時數。我們本來使用非常簡易的演算法，將資料預想成是一組、一組完美的上下班打卡記錄，逐一計算出每個人的工作時數： 假設資料表的資料如下：    ROW_NUMBER EMP_NO FLAG LOG_TIME    1 a00001 CHECK_IN 2022-06-01T07:59:02.000Z   2 a00002">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2022-12-31T17:12:00.000Z">
+<meta property="article:modified_time" content="2022-12-31T17:14:23.797Z">
+<meta property="article:author" content="jsgao0">
+<meta property="article:tag" content="Algorithm">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="上下班打卡紀錄">
+<meta property="article:tag" content="Performance">
+<meta property="article:tag" content="TypeScript">
+<meta property="article:tag" content="SQL">
+<meta property="article:tag" content="Window function">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>刪除連續的上班紀錄或是連續的下班紀錄</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- rss -->
+    
+    
+    <script type="text/javascript">
+      (function(p,u,s,h){
+          p._pcq=p._pcq||[];
+          p._pcq.push(['_currentTime',Date.now()]);
+          s=u.createElement('script');
+          s.type='text/javascript';
+          s.async=true;
+          s.src='https://cdn.pushcrew.com/js/2c18bacb4fd640e524a708622ef07f92.js';
+          h=u.getElementsByTagName('script')[0];
+          h.parentNode.insertBefore(s,h);
+      })(window,document);
+    </script>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-59178595-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Disqus Comments -->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'jsgao0';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2022/12/28/browser-page-lifecycle/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&text=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&title=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&is_video=false&description=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=刪除連續的上班紀錄或是連續的下班紀錄&body=Check out this article: https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&title=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&title=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&title=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&title=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&name=刪除連續的上班紀錄或是連續的下班紀錄&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B7%A3%E7%94%B1"><span class="toc-number">1.</span> <span class="toc-text">緣由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8F%BE%E5%AF%A6"><span class="toc-number">2.</span> <span class="toc-text">現實</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">3.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WINDOW-FUNCTION"><span class="toc-number">4.</span> <span class="toc-text">WINDOW FUNCTION</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        刪除連續的上班紀錄或是連續的下班紀錄
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Anson Keeps</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2022-12-31T17:12:00.000Z" itemprop="datePublished">2023-01-01</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Algorithm/" rel="tag">Algorithm</a>, <a class="tag-link-link" href="/tags/JavaScript/" rel="tag">JavaScript</a>, <a class="tag-link-link" href="/tags/Performance/" rel="tag">Performance</a>, <a class="tag-link-link" href="/tags/SQL/" rel="tag">SQL</a>, <a class="tag-link-link" href="/tags/TypeScript/" rel="tag">TypeScript</a>, <a class="tag-link-link" href="/tags/Window-function/" rel="tag">Window function</a>, <a class="tag-link-link" href="/tags/%E4%B8%8A%E4%B8%8B%E7%8F%AD%E6%89%93%E5%8D%A1%E7%B4%80%E9%8C%84/" rel="tag">上下班打卡紀錄</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="緣由"><a href="#緣由" class="headerlink" title="緣由"></a>緣由</h2><p>前陣子在設計某項功能，這個功能需要將每個人在資料庫的上下班打卡紀錄，計算成工作時數。我們本來使用非常簡易的演算法，將資料預想成是一組、一組完美的上下班打卡記錄，逐一計算出每個人的工作時數：</p>
+<p>假設資料表的資料如下：</p>
+<table>
+<thead>
+<tr>
+<th>ROW_NUMBER</th>
+<th>EMP_NO</th>
+<th>FLAG</th>
+<th>LOG_TIME</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>a00001</td>
+<td>CHECK_IN</td>
+<td>2022-06-01T07:59:02.000Z</td>
+</tr>
+<tr>
+<td>2</td>
+<td>a00002</td>
+<td>CHECK_IN</td>
+<td>2022-06-01T07:59:08.000Z</td>
+</tr>
+<tr>
+<td>3</td>
+<td>a00001</td>
+<td>CHECK_OUT</td>
+<td>2022-06-01T17:02:32.000Z</td>
+</tr>
+<tr>
+<td>4</td>
+<td>a00002</td>
+<td>CHECK_OUT</td>
+<td>2022-06-01T17:02:42.000Z</td>
+</tr>
+<tr>
+<td>5</td>
+<td>a00002</td>
+<td>CHECK_IN</td>
+<td>2022-06-02T07:49:08.000Z</td>
+</tr>
+<tr>
+<td>6</td>
+<td>a00001</td>
+<td>CHECK_IN</td>
+<td>2022-06-02T07:58:42.000Z</td>
+</tr>
+<tr>
+<td>7</td>
+<td>a00002</td>
+<td>CHECK_OUT</td>
+<td>2022-06-02T17:01:02.000Z</td>
+</tr>
+<tr>
+<td>8</td>
+<td>a00001</td>
+<td>CHECK_OUT</td>
+<td>2022-06-02T17:04:22.000Z</td>
+</tr>
+</tbody></table>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> <span class="title class_">FlagType</span> = <span class="string">&#x27;CHECK_IN&#x27;</span> | <span class="string">&#x27;CHECK_OUT&#x27;</span>;</span><br><span class="line"><span class="keyword">type</span> <span class="title class_">WorkRecord</span> = &#123; <span class="attr">EMP_NO</span>: <span class="built_in">string</span>; <span class="attr">LOG_TIME</span>: <span class="title class_">Date</span>; <span class="attr">FLAG</span>: <span class="title class_">FlagType</span> &#125;;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getWorkingHours</span>(<span class="params">employeeId: <span class="built_in">string</span></span>): <span class="built_in">number</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> <span class="attr">foundRecords</span>: <span class="title class_">WorkRecord</span>[] = <span class="title function_">findRecordsByEmployeeId</span>(employeeId);</span><br><span class="line">  <span class="keyword">return</span> foundRecords.<span class="title function_">reduce</span>(<span class="function">(<span class="params">[prevRecord, workingHours], record</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; <span class="attr">LOG_TIME</span>: <span class="variable constant_">CURRENT_LOG_TIME</span>, <span class="attr">FLAG</span>: <span class="variable constant_">CURRENT_FLAG</span> &#125; = record;</span><br><span class="line">    <span class="keyword">const</span> &#123; <span class="attr">LOG_TIME</span>: <span class="variable constant_">PREV_LOG_TIME</span>, <span class="attr">FLAG</span>: <span class="variable constant_">PREV_FLAG</span> &#125; = prevRecord;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 若前一筆是上班紀錄且當前這筆是下班紀錄，則：</span></span><br><span class="line">    <span class="comment">// 1) 把當前的 record 作為下一筆的 prevRecord</span></span><br><span class="line">    <span class="comment">// 2) 疊加 workingHours 並回傳</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="variable constant_">PREV_FLAG</span> === <span class="string">&#x27;CHECK_IN&#x27;</span> &amp;&amp; <span class="variable constant_">CURRENT_FLAG</span> === <span class="string">&#x27;CHECK_OUT&#x27;</span>) &#123;</span><br><span class="line">      <span class="keyword">const</span> accHours = (<span class="variable constant_">LOG_TIME</span>.<span class="title function_">getTime</span>() - <span class="variable constant_">PREV_LOG_TIME</span>.<span class="title function_">getTime</span>()) / <span class="number">1000</span> / <span class="number">3600</span>;</span><br><span class="line">      <span class="keyword">return</span> [record, workingHours + accHours];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 否則：</span></span><br><span class="line">    <span class="comment">// 1) 把當前的 record 作為下一筆的 prevRecord</span></span><br><span class="line">    <span class="comment">// 2) 直接回傳 workingHours</span></span><br><span class="line">    <span class="keyword">return</span> [record, workingHours];</span><br><span class="line">  &#125;, [<span class="literal">null</span>, <span class="number">0</span>] <span class="keyword">as</span> [<span class="literal">null</span> | <span class="title class_">WorkRecord</span>, <span class="built_in">number</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面這段演算法很單純，只會將 <code>CHECK_IN</code> -&gt; <code>CHECK_OUT</code> 的差值加計到上下班時數的累計時數。</p>
+<h2 id="現實"><a href="#現實" class="headerlink" title="現實"></a>現實</h2><p>但是，事實並沒有這麼理想，因為有些員工可能會因為怕漏刷而連續刷多次上班或下班打卡記錄。這樣一來，上下班時數很有可能被計算錯誤。舉例來說，員工 <code>a00001</code> 在 <code>2022-06-20</code> 的上下班紀錄如下：</p>
+<table>
+<thead>
+<tr>
+<th>ROW_NUMBER</th>
+<th>EMP_NO</th>
+<th>FLAG</th>
+<th>LOG_TIME</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>a00001</td>
+<td>CHECK_IN</td>
+<td>2022-06-20T07:59:02.000Z</td>
+</tr>
+<tr>
+<td>2</td>
+<td>a00001</td>
+<td>CHECK_IN</td>
+<td>2022-06-20T07:59:04.000Z</td>
+</tr>
+<tr>
+<td>3</td>
+<td>a00001</td>
+<td>CHECK_IN</td>
+<td>2022-06-20T07:59:05.000Z</td>
+</tr>
+<tr>
+<td>4</td>
+<td>a00001</td>
+<td>CHECK_OUT</td>
+<td>2022-06-20T17:02:20.000Z</td>
+</tr>
+<tr>
+<td>5</td>
+<td>a00001</td>
+<td>CHECK_OUT</td>
+<td>2022-06-20T17:02:23.000Z</td>
+</tr>
+</tbody></table>
+<p>如果是用上面的演算法來計算員工 <code>a00001</code> 在 <code>2022-06-20</code> 的工作時數， 第 3 筆會被認為上班時間 ，而第 4 筆則會被認為是下班時間；但是，以常理來看，上下班時間分別應該是第 1 筆和第 5 筆。</p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>回顧一開始的演算法，僅著重在當前紀錄與前一筆的關係。實在摸不著頭緒的時候，我把時間軸、可能的上下班紀錄畫出來。在幾番思考之後，我歸納出了一個對應表，可以將原始的上下班紀錄轉換為成對的上下班紀錄。</p>
+<table>
+<thead>
+<tr>
+<th>CASE NO.</th>
+<th>T1(PREV)</th>
+<th>T2(CURRENT)</th>
+<th>T3(NEXT)</th>
+<th>WORK_START</th>
+<th>WORK_END</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>CHECK_IN</td>
+<td>CHECK_IN</td>
+<td>CHECK_IN</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td>CHECK_IN</td>
+<td>CHECK_IN</td>
+<td>CHECK_OUT</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td>CHECK_IN</td>
+<td>CHECK_OUT</td>
+<td>CHECK_IN</td>
+<td></td>
+<td>T2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>CHECK_IN</td>
+<td>CHECK_OUT</td>
+<td>CHECK_OUT</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td>CHECK_OUT</td>
+<td>CHECK_IN</td>
+<td>CHECK_IN</td>
+<td>T2</td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td>CHECK_OUT</td>
+<td>CHECK_IN</td>
+<td>CHECK_OUT</td>
+<td>T2</td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td>CHECK_OUT</td>
+<td>CHECK_OUT</td>
+<td>CHECK_IN</td>
+<td></td>
+<td>T2</td>
+</tr>
+<tr>
+<td>8</td>
+<td>CHECK_OUT</td>
+<td>CHECK_OUT</td>
+<td>CHECK_OUT</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>在歸納出這張表之前，不斷地思考如何找出「能夠計入上下班的紀錄」，反覆地看著時間軸和其上面的上下班紀錄。基本上可以看出兩個規則：</p>
+<ol>
+<li>若當前是上班紀錄且前一筆是下班紀錄，則當前這筆上班紀錄是最後要計入時數的起算時間點</li>
+<li>若當前是下班紀錄且下一筆是上班紀錄，則當前這筆下班紀錄是最後要計入時數的結算時間點</li>
+</ol>
+<p>其餘的紀錄就把它排除囉～</p>
+<p>所以，先做一次資料梳理，就能接著使用原本的工作時數演算法了。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> <span class="title class_">FlagType</span> = <span class="string">&#x27;CHECK_IN&#x27;</span> | <span class="string">&#x27;CHECK_OUT&#x27;</span>;</span><br><span class="line"><span class="keyword">type</span> <span class="title class_">WorkRecord</span> = &#123; <span class="attr">EMP_NO</span>: <span class="built_in">string</span>; <span class="attr">LOG_TIME</span>: <span class="title class_">Date</span>; <span class="attr">FLAG</span>: <span class="title class_">FlagType</span> &#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getWorkingHours</span>(<span class="params">employeeId: <span class="built_in">string</span></span>): <span class="built_in">number</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> <span class="attr">foundRecords</span>: <span class="title class_">WorkRecord</span>[] = <span class="title function_">findRecordsByEmployeeId</span>(employeeId);</span><br><span class="line">  <span class="keyword">return</span> foundRecords</span><br><span class="line">    .<span class="title function_">filter</span>(<span class="function">(<span class="params">record, index, allRecords</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 因為接下來會看前一筆和後一筆，但是第一筆沒有前一筆資料、最後一筆沒有下一筆資料，所以要特殊處理、直接計入</span></span><br><span class="line">      <span class="keyword">if</span> (index === <span class="number">0</span> || index === allRecords.<span class="property">length</span> - <span class="number">1</span>) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">      <span class="keyword">const</span> &#123; <span class="attr">FLAG</span>: <span class="variable constant_">PREV_FLAG</span> &#125; = allRecords[index - <span class="number">1</span>];</span><br><span class="line">      <span class="keyword">const</span> &#123; <span class="attr">FLAG</span>: <span class="variable constant_">NEXT_FLAG</span> &#125; = allRecords[index + <span class="number">1</span>];</span><br><span class="line">      <span class="keyword">const</span> &#123; <span class="attr">FLAG</span>: <span class="variable constant_">CURRENT_FLAG</span> &#125; = record;</span><br><span class="line">      <span class="keyword">if</span> (<span class="variable constant_">CURRENT_FLAG</span> === <span class="string">&#x27;CHECK_IN&#x27;</span> &amp;&amp; <span class="variable constant_">PREV_FLAG</span> === <span class="string">&#x27;CHECK_OUT&#x27;</span>) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">      <span class="keyword">if</span> (<span class="variable constant_">CURRENT_FLAG</span> === <span class="string">&#x27;CHECK_OUT&#x27;</span> &amp;&amp; <span class="variable constant_">NEXT_FLAG</span> === <span class="string">&#x27;CHECK_IN&#x27;</span>) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;)</span><br><span class="line">    .<span class="title function_">reduce</span>(<span class="function">(<span class="params">[prevRecord, workingHours], record</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> &#123; <span class="attr">LOG_TIME</span>: <span class="variable constant_">CURRENT_LOG_TIME</span>, <span class="attr">FLAG</span>: <span class="variable constant_">CURRENT_FLAG</span> &#125; = record;</span><br><span class="line">      <span class="keyword">const</span> &#123; <span class="attr">LOG_TIME</span>: <span class="variable constant_">PREV_LOG_TIME</span>, <span class="attr">FLAG</span>: <span class="variable constant_">PREV_FLAG</span> &#125; = prevRecord;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 若前一筆是上班紀錄且當前這筆是下班紀錄，則：</span></span><br><span class="line">      <span class="comment">// 1) 把當前的 record 作為下一筆的 prevRecord</span></span><br><span class="line">      <span class="comment">// 2) 疊加 workingHours 並回傳</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="variable constant_">PREV_FLAG</span> === <span class="string">&#x27;CHECK_IN&#x27;</span> &amp;&amp; <span class="variable constant_">CURRENT_FLAG</span> === <span class="string">&#x27;CHECK_OUT&#x27;</span>) &#123;</span><br><span class="line">        <span class="keyword">const</span> accHours = (<span class="variable constant_">LOG_TIME</span>.<span class="title function_">getTime</span>() - <span class="variable constant_">PREV_LOG_TIME</span>.<span class="title function_">getTime</span>()) / <span class="number">1000</span> / <span class="number">3600</span>;</span><br><span class="line">        <span class="keyword">return</span> [record, workingHours + accHours];</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 否則：</span></span><br><span class="line">      <span class="comment">// 1) 把當前的 record 作為下一筆的 prevRecord</span></span><br><span class="line">      <span class="comment">// 2) 直接回傳 workingHours</span></span><br><span class="line">      <span class="keyword">return</span> [record, workingHours];</span><br><span class="line">    &#125;, [<span class="literal">null</span>, <span class="number">0</span>] <span class="keyword">as</span> [<span class="literal">null</span> | <span class="title class_">WorkRecord</span>, <span class="built_in">number</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的演算法時間複雜度為 <code>O(n)</code> ，效率還蠻不錯的。在沒有列出排列組合表分析之前，本想打算用暴力的方式用兩層迴圈來篩選資料，但是一次要跑幾十萬筆資料的情況下，會讓 CPU 爆炸，於是就放棄了。</p>
+<h2 id="WINDOW-FUNCTION"><a href="#WINDOW-FUNCTION" class="headerlink" title="WINDOW FUNCTION"></a>WINDOW FUNCTION</h2><p>最近剛好學到 WINDOW FUNCTION ，馬上就聯想到這個例子可以用這個方法解，效率應該不會差到哪去，且可以把 accumulation 也一起交給 SQL 來做，這樣省下了不少功夫…</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 用 CTE 把 query 一個一個串起來、比較好閱讀 */</span></span><br><span class="line"><span class="keyword">WITH</span></span><br><span class="line">  <span class="comment">/* 先把每一筆紀錄的前後紀錄找出來，放在同一筆 row */</span></span><br><span class="line">	working_records <span class="keyword">AS</span> (</span><br><span class="line">		<span class="keyword">SELECT</span> emp_no,</span><br><span class="line">			<span class="built_in">LAG</span>(flag, <span class="number">1</span>) <span class="keyword">OVER</span> (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> emp_no <span class="keyword">ORDER</span> <span class="keyword">BY</span> log_time <span class="keyword">ASC</span>) <span class="keyword">AS</span> prev_record_flag,</span><br><span class="line">			<span class="built_in">LAG</span>(log_time, <span class="number">1</span>) <span class="keyword">OVER</span> (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> emp_no <span class="keyword">ORDER</span> <span class="keyword">BY</span> log_time <span class="keyword">ASC</span>) <span class="keyword">AS</span> prev_record_time,</span><br><span class="line">			flag <span class="keyword">AS</span> current_flag,</span><br><span class="line">			log_time <span class="keyword">AS</span> current_record_time,</span><br><span class="line">			<span class="built_in">LEAD</span>(flag, <span class="number">1</span>) <span class="keyword">OVER</span> (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> emp_no <span class="keyword">ORDER</span> <span class="keyword">BY</span> log_time <span class="keyword">ASC</span>) <span class="keyword">AS</span> next_record_flag,</span><br><span class="line">			<span class="built_in">LEAD</span>(log_time, <span class="number">1</span>) <span class="keyword">OVER</span> (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> emp_no <span class="keyword">ORDER</span> <span class="keyword">BY</span> log_time <span class="keyword">ASC</span>) <span class="keyword">AS</span> next_record_time</span><br><span class="line">		<span class="keyword">FROM</span> test_anson_employee_working_records</span><br><span class="line">	),</span><br><span class="line"></span><br><span class="line">  <span class="comment">/* 套用剛剛提到的規則篩選出要留下的紀錄 */</span></span><br><span class="line">  filtered_working_records <span class="keyword">AS</span> (</span><br><span class="line">    <span class="keyword">SELECT</span> emp_no, current_flag, current_record_time</span><br><span class="line">    <span class="keyword">FROM</span> working_records</span><br><span class="line">    <span class="keyword">WHERE</span> </span><br><span class="line">      (current_flag <span class="operator">=</span> <span class="string">&#x27;CHECK_IN&#x27;</span> <span class="keyword">AND</span> prev_record_flag <span class="keyword">is</span> <span class="keyword">null</span>) <span class="keyword">or</span></span><br><span class="line">      (current_flag <span class="operator">=</span> <span class="string">&#x27;CHECK_IN&#x27;</span> <span class="keyword">AND</span> prev_record_flag <span class="operator">=</span> <span class="string">&#x27;CHECK_OUT&#x27;</span>) <span class="keyword">or</span></span><br><span class="line">      (current_flag <span class="operator">=</span> <span class="string">&#x27;CHECK_OUT&#x27;</span> <span class="keyword">AND</span> next_record_flag <span class="operator">=</span> <span class="string">&#x27;CHECK_IN&#x27;</span>) <span class="keyword">or</span></span><br><span class="line">      (current_flag <span class="operator">=</span> <span class="string">&#x27;CHECK_OUT&#x27;</span> <span class="keyword">AND</span> next_record_flag <span class="keyword">is</span> <span class="keyword">null</span>)</span><br><span class="line">  ),</span><br><span class="line"></span><br><span class="line">  working_hours <span class="keyword">AS</span> (</span><br><span class="line">    <span class="comment">/* 找出每一筆上班紀錄，然後再用一次 `LEAD` 找出下一筆下班紀錄(因為已經篩選過，所以資料都是上下班按照順序排序)算出當次的上班時間 */</span></span><br><span class="line">    <span class="comment">/* 待修正：沒辦法正確算出 diff ，可能是 PARTITION 的問題？ */</span></span><br><span class="line">    <span class="keyword">SELECT</span> emp_no, <span class="built_in">LEAD</span>(current_record_time, <span class="number">1</span>) <span class="keyword">OVER</span> (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> emp_no <span class="keyword">ORDER</span> <span class="keyword">BY</span> current_record_time) <span class="operator">-</span> current_record_time</span><br><span class="line">    <span class="keyword">FROM</span> filtered_working_records</span><br><span class="line">    <span class="keyword">WHERE</span> current_flag <span class="operator">=</span> <span class="string">&#x27;CHECK_IN&#x27;</span></span><br><span class="line">  )</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 加總... */</span></span><br></pre></td></tr></table></figure>
+
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+    </div>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B7%A3%E7%94%B1"><span class="toc-number">1.</span> <span class="toc-text">緣由</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8F%BE%E5%AF%A6"><span class="toc-number">2.</span> <span class="toc-text">現實</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%9D%E8%B7%AF"><span class="toc-number">3.</span> <span class="toc-text">思路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WINDOW-FUNCTION"><span class="toc-number">4.</span> <span class="toc-text">WINDOW FUNCTION</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&text=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&title=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&is_video=false&description=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=刪除連續的上班紀錄或是連續的下班紀錄&body=Check out this article: https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&title=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&title=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&title=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&title=刪除連續的上班紀錄或是連續的下班紀錄"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jsgao0.github.io/2023/01/01/reduce-consecutive-checkin-and-checkout-records/&name=刪除連續的上班紀錄或是連續的下班紀錄&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2023 jsgao0
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
