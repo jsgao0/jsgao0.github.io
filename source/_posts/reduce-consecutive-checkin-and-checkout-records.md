@@ -1,15 +1,16 @@
 ---
-title: 刪除連續的上班紀錄或是連續的下班紀錄
+title: 計算員工的工作時數
 tags:
-    - Algorithm
-    - JavaScript
-    - TypeScript
-    - 上下班打卡紀錄
-    - Performance
-    - SQL
-    - Window function
+  - Algorithm
+  - JavaScript
+  - TypeScript
+  - 上下班打卡紀錄
+  - Performance
+  - SQL
+  - Window function
 date: 2023-01-01 01:12:00
 ---
+
 
 ## 緣由
 前陣子在設計某項功能，這個功能需要將每個人在資料庫的上下班打卡紀錄，計算成工作時數。我們本來使用非常簡易的演算法，將資料預想成是一組、一組完美的上下班打卡記錄，逐一計算出每個人的工作時數：
@@ -132,6 +133,7 @@ function getWorkingHours(employeeId: string): number {
 最近剛好學到 WINDOW FUNCTION ，馬上就聯想到這個例子可以用這個方法解，效率應該不會差到哪去，且可以把 accumulation 也一起交給 SQL 來做，這樣省下了不少功夫...
 
 ``` SQL
+/* PostgreSQL */
 /* 用 CTE 把 query 一個一個串起來、比較好閱讀 */
 WITH
   /* 先把每一筆紀錄的前後紀錄找出來，放在同一筆 row */
