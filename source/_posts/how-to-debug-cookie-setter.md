@@ -1,11 +1,12 @@
 ---
 title: 運用 `Object.defineProperty` 對 `document.cookie` 除錯
 tags:
-    - Cookies
-    - JavaScript
-    - debug
+  - Cookies
+  - JavaScript
+  - debug
 date: 2023-04-28 21:59:00
 ---
+
 前陣子陸續發生兩次因為不合法的 cookie 值，在呼叫 API 時帶入到 HTTP request header 中，導致 API 在解析 cookie 值的時候發生錯誤，間接導致多數功能出現異常。
 這篇文章會紀錄：
 1. 如何利用 `Object.defineProperty` 和 `console.trace` 來攔截並查看是由誰來寫入 `document.cookie`
