@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Explaining the runtime differences between Edge and Node.js in Next.js, cookie handling, and best practices for working with Set-Cookie headers.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices">
+<meta property="og:url" content="https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/index.html">
+<meta property="og:site_name" content="Anson Keeps">
+<meta property="og:description" content="Explaining the runtime differences between Edge and Node.js in Next.js, cookie handling, and best practices for working with Set-Cookie headers.">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2025-09-25T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-09-26T15:35:58.931Z">
+<meta property="article:author" content="jsgao0">
+<meta property="article:tag" content="Cookies">
+<meta property="article:tag" content="Next.js">
+<meta property="article:tag" content="Edge">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="Set-Cookie">
+<meta property="article:tag" content="Web Dev">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices</title>
+
+    
+      <!-- Google Tag Manager -->
+      <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-WFMQFRKC');</script>
+      <!-- End Google Tag Manager -->
+    
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- rss -->
+    
+    
+    <script type="text/javascript">
+      (function(p,u,s,h){
+          p._pcq=p._pcq||[];
+          p._pcq.push(['_currentTime',Date.now()]);
+          s=u.createElement('script');
+          s.type='text/javascript';
+          s.async=true;
+          s.src='https://cdn.pushcrew.com/js/2c18bacb4fd640e524a708622ef07f92.js';
+          h=u.getElementsByTagName('script')[0];
+          h.parentNode.insertBefore(s,h);
+      })(window,document);
+    </script>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<link rel="stylesheet" href="/lib/meslo-LG/styles.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/justifiedGallery.min.css">
+
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- Google Analytics -->
+
+<!-- Disqus Comments -->
+
+    <script type="text/javascript">
+        var disqus_shortname = 'jsgao0';
+
+        (function(){
+            var dsq = document.createElement('script');
+            dsq.type = 'text/javascript';
+            dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        }());
+    </script>
+
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+    
+      <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WFMQFRKC"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+      <!-- End Google Tag Manager (noscript) -->
+    
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fa fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2023/04/28/how-to-debug-cookie-setter/"><i class="fa fa-chevron-right" aria-hidden="true" onmouseover='$("#i-next").toggle();' onmouseout='$("#i-next").toggle();'></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up" aria-hidden="true" onmouseover='$("#i-top").toggle();' onmouseout='$("#i-top").toggle();'></i></a></li>
+        <li><a class="icon" href="#"><i class="fa fa-share-alt" aria-hidden="true" onmouseover='$("#i-share").toggle();' onmouseout='$("#i-share").toggle();' onclick='$("#share").toggle();return false;'></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/"><i class="fa fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&text=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&title=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&is_video=false&description=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices&body=Check out this article: https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/"><i class="fa fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&title=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&title=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&title=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&title=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&name=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices&description="><i class="fa fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Execution-Environments"><span class="toc-number">1.</span> <span class="toc-text">1) Execution Environments</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Reading-Cookies-in-Edge-vs-Node-js"><span class="toc-number">2.</span> <span class="toc-text">2) Reading Cookies in Edge vs Node.js</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#In-Middleware-Edge"><span class="toc-number">2.1.</span> <span class="toc-text">In Middleware (Edge)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#In-Node-js-Runtime-pages-x2F-server-actions-x2F-route-handlers"><span class="toc-number">2.2.</span> <span class="toc-text">In Node.js Runtime (pages&#x2F;server actions&#x2F;route handlers)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reading-upstream-Set-Cookie-in-Node-js"><span class="toc-number">2.3.</span> <span class="toc-text">Reading upstream Set-Cookie in Node.js</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reading-server-Set-Cookie-via-next-headers"><span class="toc-number">2.4.</span> <span class="toc-text">Reading server Set-Cookie via next&#x2F;headers</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Writing-Set-Cookie-Use-append-not-set"><span class="toc-number">3.</span> <span class="toc-text">3) Writing Set-Cookie: Use append, not set</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Parsing-Set-Cookie-Common-Pitfalls"><span class="toc-number">4.</span> <span class="toc-text">4) Parsing Set-Cookie: Common Pitfalls</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Recommendations"><span class="toc-number">4.1.</span> <span class="toc-text">Recommendations</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Example-Robust-parsing-amp-forwarding-Node-js"><span class="toc-number">4.2.</span> <span class="toc-text">Example: Robust parsing &amp; forwarding (Node.js)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Takeaways"><span class="toc-number">5.</span> <span class="toc-text">Takeaways</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index width mx-auto px2 my4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Anson</span>
+      </span>
+      
+    <div class="postdate">
+        <time datetime="2025-09-25T16:00:00.000Z" itemprop="datePublished">2025-09-26</time>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/Cookies/" rel="tag">Cookies</a>, <a class="tag-link-link" href="/tags/Edge/" rel="tag">Edge</a>, <a class="tag-link-link" href="/tags/Next-js/" rel="tag">Next.js</a>, <a class="tag-link-link" href="/tags/Node-js/" rel="tag">Node.js</a>, <a class="tag-link-link" href="/tags/Set-Cookie/" rel="tag">Set-Cookie</a>, <a class="tag-link-link" href="/tags/Web-Dev/" rel="tag">Web Dev</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>In Next.js 13&#x2F;14 (App Router), the <strong>runtime environment</strong> defines what APIs you can use and how certain behaviors differ. While building unified login flows and tracking systems, I’ve run into several recurring issues around cookies and <code>Set-Cookie</code>. This post summarizes key points:  </p>
+<ol>
+<li>Middleware runs on <strong>Edge Runtime</strong>, while pages&#x2F;layouts&#x2F;route handlers run on <strong>Node.js Runtime</strong>.  </li>
+<li>How to access cookies in both environments, and how Node.js can read upstream and server <code>Set-Cookie</code>.  </li>
+<li>Why you must use <code>response.headers.append</code> (not <code>set</code>) when writing multiple <code>Set-Cookie</code> values.  </li>
+<li>What to watch out for when parsing <code>Set-Cookie</code>.</li>
+</ol>
+<hr>
+<h2 id="1-Execution-Environments"><a href="#1-Execution-Environments" class="headerlink" title="1) Execution Environments"></a>1) Execution Environments</h2><ul>
+<li><p><strong><code>middleware.ts</code> &#x2F; <code>middleware.js</code></strong> → Runs on <strong>Edge Runtime</strong>.<br>You get <code>NextRequest</code> and <code>NextResponse</code>, use Web Standard APIs (Headers, Request, Response), but no Node.js built-ins.</p>
+</li>
+<li><p><strong><code>app/**</code> pages, layouts, route handlers (e.g. <code>app/api/**/route.ts</code>)</strong> → Run in <strong>Node.js Runtime by default</strong>.<br>You can use <code>next/headers</code> (<code>cookies()</code>, <code>headers()</code>), Node’s <code>fetch</code> behavior (can read <code>set-cookie</code>), and Node features.</p>
+</li>
+<li><p>You can override runtime for specific routes with:  </p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> runtime = <span class="string">&#x27;edge&#x27;</span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<hr>
+<h2 id="2-Reading-Cookies-in-Edge-vs-Node-js"><a href="#2-Reading-Cookies-in-Edge-vs-Node-js" class="headerlink" title="2) Reading Cookies in Edge vs Node.js"></a>2) Reading Cookies in Edge vs Node.js</h2><h3 id="In-Middleware-Edge"><a href="#In-Middleware-Edge" class="headerlink" title="In Middleware (Edge)"></a>In <strong>Middleware (Edge)</strong></h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// middleware.ts</span></span><br><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">NextRequest</span>, <span class="title class_">NextResponse</span> &#125; <span class="keyword">from</span> <span class="string">&#x27;next/server&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">function</span> <span class="title function_">middleware</span>(<span class="params">req: NextRequest</span>) &#123;</span><br><span class="line">  <span class="comment">// Read</span></span><br><span class="line">  <span class="keyword">const</span> token = req.<span class="property">cookies</span>.<span class="title function_">get</span>(<span class="string">&#x27;access_token&#x27;</span>)?.<span class="property">value</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Write</span></span><br><span class="line">  <span class="keyword">const</span> res = <span class="title class_">NextResponse</span>.<span class="title function_">next</span>();</span><br><span class="line">  res.<span class="property">cookies</span>.<span class="title function_">set</span>(&#123;</span><br><span class="line">    <span class="attr">name</span>: <span class="string">&#x27;from_mw&#x27;</span>,</span><br><span class="line">    <span class="attr">value</span>: <span class="string">&#x27;1&#x27;</span>,</span><br><span class="line">    <span class="attr">httpOnly</span>: <span class="literal">true</span>,</span><br><span class="line">    <span class="attr">path</span>: <span class="string">&#x27;/&#x27;</span>,</span><br><span class="line">    <span class="attr">sameSite</span>: <span class="string">&#x27;Lax&#x27;</span>,</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="In-Node-js-Runtime-pages-x2F-server-actions-x2F-route-handlers"><a href="#In-Node-js-Runtime-pages-x2F-server-actions-x2F-route-handlers" class="headerlink" title="In Node.js Runtime (pages&#x2F;server actions&#x2F;route handlers)"></a>In <strong>Node.js Runtime (pages&#x2F;server actions&#x2F;route handlers)</strong></h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; cookies, headers &#125; <span class="keyword">from</span> <span class="string">&#x27;next/headers&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">GET</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> cookieStore = <span class="title function_">cookies</span>();</span><br><span class="line">  <span class="keyword">const</span> access = cookieStore.<span class="title function_">get</span>(<span class="string">&#x27;access_token&#x27;</span>)?.<span class="property">value</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> h = <span class="title function_">headers</span>();</span><br><span class="line">  <span class="keyword">const</span> auth = h.<span class="title function_">get</span>(<span class="string">&#x27;authorization&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(&#123; access, auth &#125;), &#123;</span><br><span class="line">    <span class="attr">headers</span>: &#123; <span class="string">&#x27;content-type&#x27;</span>: <span class="string">&#x27;application/json&#x27;</span> &#125;,</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Reading-upstream-Set-Cookie-in-Node-js"><a href="#Reading-upstream-Set-Cookie-in-Node-js" class="headerlink" title="Reading upstream Set-Cookie in Node.js"></a>Reading upstream <code>Set-Cookie</code> in <strong>Node.js</strong></h3><p>Unlike browsers, <strong>Node.js <code>fetch</code> can access <code>set-cookie</code></strong> from upstream responses:</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> upstream = <span class="keyword">await</span> <span class="title function_">fetch</span>(<span class="string">&#x27;https://auth.example.com/login&#x27;</span>, &#123;</span><br><span class="line">  <span class="attr">method</span>: <span class="string">&#x27;POST&#x27;</span>,</span><br><span class="line">  <span class="attr">body</span>: <span class="title class_">JSON</span>.<span class="title function_">stringify</span>(&#123; username, password &#125;),</span><br><span class="line">  <span class="attr">headers</span>: &#123; <span class="string">&#x27;content-type&#x27;</span>: <span class="string">&#x27;application/json&#x27;</span> &#125;,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ Available in Node.js</span></span><br><span class="line"><span class="keyword">const</span> setCookieHeader = upstream.<span class="property">headers</span>.<span class="title function_">get</span>(<span class="string">&#x27;set-cookie&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Reading-server-Set-Cookie-via-next-headers"><a href="#Reading-server-Set-Cookie-via-next-headers" class="headerlink" title="Reading server Set-Cookie via next/headers"></a>Reading server <code>Set-Cookie</code> via <code>next/headers</code></h3><p>In Node.js runtime, <code>headers()</code> also exposes response-bound headers.<br>That means you can read <strong>cookies that your server is about to set</strong> with <code>headers().get(&#39;set-cookie&#39;)</code>.</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// app/api/demo/route.ts</span></span><br><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">NextResponse</span> &#125; <span class="keyword">from</span> <span class="string">&#x27;next/server&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">GET</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> res = <span class="title class_">NextResponse</span>.<span class="title function_">json</span>(&#123; <span class="attr">msg</span>: <span class="string">&#x27;ok&#x27;</span> &#125;);</span><br><span class="line">  res.<span class="property">cookies</span>.<span class="title function_">set</span>(<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;1&#x27;</span>, &#123; <span class="attr">httpOnly</span>: <span class="literal">true</span>, <span class="attr">path</span>: <span class="string">&#x27;/&#x27;</span> &#125;);</span><br><span class="line">  res.<span class="property">cookies</span>.<span class="title function_">set</span>(<span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;2&#x27;</span>, &#123; <span class="attr">httpOnly</span>: <span class="literal">true</span>, <span class="attr">path</span>: <span class="string">&#x27;/&#x27;</span> &#125;);</span><br><span class="line">  <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// app/api/check/route.ts</span></span><br><span class="line"><span class="keyword">import</span> &#123; headers &#125; <span class="keyword">from</span> <span class="string">&#x27;next/headers&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">GET</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> h = <span class="title function_">headers</span>();</span><br><span class="line">  <span class="keyword">const</span> setCookieHeader = h.<span class="title function_">get</span>(<span class="string">&#x27;set-cookie&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="title class_">Response</span>.<span class="title function_">json</span>(&#123;</span><br><span class="line">    <span class="string">&#x27;set-cookie&#x27;</span>: setCookieHeader,</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Output:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;set-cookie&quot;</span><span class="punctuation">:</span> <span class="string">&quot;a=1; Path=/; HttpOnly; SameSite=Lax, b=2; Path=/; HttpOnly; SameSite=Lax&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>👉 <strong>Key point</strong>:  </p>
+<ul>
+<li><code>headers().get(&#39;cookie&#39;)</code> → gives you cookies from the <strong>client request</strong>.  </li>
+<li><code>headers().get(&#39;set-cookie&#39;)</code> → gives you cookies that the <strong>server response is about to send</strong> (only in Node.js runtime).</li>
+</ul>
+<hr>
+<h2 id="3-Writing-Set-Cookie-Use-append-not-set"><a href="#3-Writing-Set-Cookie-Use-append-not-set" class="headerlink" title="3) Writing Set-Cookie: Use append, not set"></a>3) Writing <code>Set-Cookie</code>: Use <code>append</code>, not <code>set</code></h2><p>HTTP allows multiple <code>Set-Cookie</code> headers. Using <code>headers.set(&#39;set-cookie&#39;, ...)</code> <strong>overwrites previous cookies</strong>. Always use <code>append</code>.</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ❌ Overwrites</span></span><br><span class="line">res.<span class="property">headers</span>.<span class="title function_">set</span>(<span class="string">&#x27;set-cookie&#x27;</span>, <span class="string">&#x27;a=1; Path=/; HttpOnly&#x27;</span>);</span><br><span class="line">res.<span class="property">headers</span>.<span class="title function_">set</span>(<span class="string">&#x27;set-cookie&#x27;</span>, <span class="string">&#x27;b=2; Path=/; HttpOnly&#x27;</span>); <span class="comment">// &#x27;a&#x27; is gone</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ✅ Correct</span></span><br><span class="line">res.<span class="property">headers</span>.<span class="title function_">append</span>(<span class="string">&#x27;set-cookie&#x27;</span>, <span class="string">&#x27;a=1; Path=/; HttpOnly&#x27;</span>);</span><br><span class="line">res.<span class="property">headers</span>.<span class="title function_">append</span>(<span class="string">&#x27;set-cookie&#x27;</span>, <span class="string">&#x27;b=2; Path=/; HttpOnly&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>💡 Tip: Prefer <code>response.cookies.set()</code> where available, as it handles multiple cookies automatically.</p>
+</blockquote>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; <span class="title class_">NextResponse</span> &#125; <span class="keyword">from</span> <span class="string">&#x27;next/server&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> res = <span class="title class_">NextResponse</span>.<span class="title function_">json</span>(&#123; <span class="attr">ok</span>: <span class="literal">true</span> &#125;);</span><br><span class="line">res.<span class="property">cookies</span>.<span class="title function_">set</span>(<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;1&#x27;</span>, &#123; <span class="attr">httpOnly</span>: <span class="literal">true</span>, <span class="attr">path</span>: <span class="string">&#x27;/&#x27;</span> &#125;);</span><br><span class="line">res.<span class="property">cookies</span>.<span class="title function_">set</span>(<span class="string">&#x27;b&#x27;</span>, <span class="string">&#x27;2&#x27;</span>, &#123; <span class="attr">httpOnly</span>: <span class="literal">true</span>, <span class="attr">path</span>: <span class="string">&#x27;/&#x27;</span> &#125;);</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-Parsing-Set-Cookie-Common-Pitfalls"><a href="#4-Parsing-Set-Cookie-Common-Pitfalls" class="headerlink" title="4) Parsing Set-Cookie: Common Pitfalls"></a>4) Parsing <code>Set-Cookie</code>: Common Pitfalls</h2><p>The tricky part is that:  </p>
+<ul>
+<li>A response may include <strong>multiple <code>Set-Cookie</code> headers</strong>.  </li>
+<li>Inside a cookie, the <code>Expires</code> attribute itself contains a <strong>comma</strong> (e.g., <code>Fri, 01 Jan 2038 00:00:00 GMT</code>).  </li>
+<li>So <strong>you cannot just split on commas</strong>.</li>
+</ul>
+<h3 id="Recommendations"><a href="#Recommendations" class="headerlink" title="Recommendations"></a>Recommendations</h3><ol>
+<li><strong>Don’t <code>split(&#39;,&#39;)</code> blindly.</strong> You’ll break cookies with <code>Expires</code>.  </li>
+<li><strong>Use a library like <code>set-cookie-parser</code></strong>:<ul>
+<li><code>splitCookiesString()</code> splits multiple cookies safely.  </li>
+<li><code>parseString()</code> parses each into structured objects.</li>
+</ul>
+</li>
+<li><strong>Attribute rules:</strong><ul>
+<li><code>Max-Age</code> overrides <code>Expires</code>.  </li>
+<li><code>SameSite=None</code> requires <code>Secure</code>.  </li>
+<li>Be mindful of defaults for <code>Path</code> and <code>Domain</code>.  </li>
+<li>Encode values properly if they contain special characters.</li>
+</ul>
+</li>
+<li><strong>Forwarding cookies:</strong>  <ul>
+<li>When proxying upstream logins, forward all <code>Set-Cookie</code> headers with <code>append</code>.  </li>
+<li>If you need to rewrite cookies, parse and reconstruct carefully.</li>
+</ul>
+</li>
+</ol>
+<h3 id="Example-Robust-parsing-amp-forwarding-Node-js"><a href="#Example-Robust-parsing-amp-forwarding-Node-js" class="headerlink" title="Example: Robust parsing &amp; forwarding (Node.js)"></a>Example: Robust parsing &amp; forwarding (Node.js)</h3><figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> setCookieParser <span class="keyword">from</span> <span class="string">&#x27;set-cookie-parser&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">POST</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> upstream = <span class="keyword">await</span> <span class="title function_">fetch</span>(<span class="string">&#x27;https://auth.example.com/login&#x27;</span>, &#123; <span class="attr">method</span>: <span class="string">&#x27;POST&#x27;</span> &#125;);</span><br><span class="line">  <span class="keyword">const</span> rawSetCookie = upstream.<span class="property">headers</span>.<span class="title function_">get</span>(<span class="string">&#x27;set-cookie&#x27;</span>) || <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> cookieStrings = setCookieParser.<span class="title function_">splitCookiesString</span>(rawSetCookie);</span><br><span class="line">  <span class="keyword">const</span> cookies = cookieStrings.<span class="title function_">map</span>(<span class="function">(<span class="params">c</span>) =&gt;</span> setCookieParser.<span class="title function_">parseString</span>(c));</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> res = <span class="keyword">new</span> <span class="title class_">Response</span>(<span class="keyword">await</span> upstream.<span class="title function_">text</span>(), &#123;</span><br><span class="line">    <span class="attr">status</span>: upstream.<span class="property">status</span>,</span><br><span class="line">    <span class="attr">headers</span>: &#123; <span class="string">&#x27;content-type&#x27;</span>: upstream.<span class="property">headers</span>.<span class="title function_">get</span>(<span class="string">&#x27;content-type&#x27;</span>) ?? <span class="string">&#x27;text/plain&#x27;</span> &#125;,</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> c <span class="keyword">of</span> cookies) &#123;</span><br><span class="line">    <span class="keyword">const</span> attrs = [</span><br><span class="line">      <span class="string">`<span class="subst">$&#123;c.name&#125;</span>=<span class="subst">$&#123;c.value&#125;</span>`</span>,</span><br><span class="line">      <span class="string">`Path=<span class="subst">$&#123;c.path ?? <span class="string">&#x27;/&#x27;</span>&#125;</span>`</span>,</span><br><span class="line">      c.<span class="property">domain</span> ? <span class="string">`Domain=<span class="subst">$&#123;c.domain&#125;</span>`</span> : <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      c.<span class="property">expires</span> ? <span class="string">`Expires=<span class="subst">$&#123;c.expires.toUTCString()&#125;</span>`</span> : <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      <span class="keyword">typeof</span> c.<span class="property">maxAge</span> === <span class="string">&#x27;number&#x27;</span> ? <span class="string">`Max-Age=<span class="subst">$&#123;c.maxAge&#125;</span>`</span> : <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      c.<span class="property">secure</span> ? <span class="string">&#x27;Secure&#x27;</span> : <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      c.<span class="property">httpOnly</span> ? <span class="string">&#x27;HttpOnly&#x27;</span> : <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">      c.<span class="property">sameSite</span> ? <span class="string">`SameSite=<span class="subst">$&#123;c.sameSite&#125;</span>`</span> : <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">    ].<span class="title function_">filter</span>(<span class="title class_">Boolean</span>);</span><br><span class="line"></span><br><span class="line">    res.<span class="property">headers</span>.<span class="title function_">append</span>(<span class="string">&#x27;set-cookie&#x27;</span>, attrs.<span class="title function_">join</span>(<span class="string">&#x27;; &#x27;</span>));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Takeaways"><a href="#Takeaways" class="headerlink" title="Takeaways"></a>Takeaways</h2><ul>
+<li><strong>middleware &#x3D; Edge</strong>, <strong>pages&#x2F;layouts&#x2F;handlers &#x3D; Node.js by default</strong>.  </li>
+<li><strong>Reading cookies</strong> works in both; <strong>reading <code>Set-Cookie</code></strong> works in Node.js via both <code>fetch</code> and <code>headers().get(&#39;set-cookie&#39;)</code>.  </li>
+<li><strong>Writing cookies</strong>: use <code>cookies.set()</code> or <code>headers.append</code>.  </li>
+<li><strong>Parsing <code>Set-Cookie</code></strong>: never split on commas, use a parser, and handle attributes properly.</li>
+</ul>
+<p>Following these patterns avoids the classic “Why did my cookie disappear?” or “Why does login only work on one device?” headaches.  </p>
+
+  </div>
+</article>
+
+    <div class="blog-post-comments">
+        <div id="disqus_thread">
+            <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        </div>
+    </div>
+
+
+
+    </div>
+    
+      <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Execution-Environments"><span class="toc-number">1.</span> <span class="toc-text">1) Execution Environments</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Reading-Cookies-in-Edge-vs-Node-js"><span class="toc-number">2.</span> <span class="toc-text">2) Reading Cookies in Edge vs Node.js</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#In-Middleware-Edge"><span class="toc-number">2.1.</span> <span class="toc-text">In Middleware (Edge)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#In-Node-js-Runtime-pages-x2F-server-actions-x2F-route-handlers"><span class="toc-number">2.2.</span> <span class="toc-text">In Node.js Runtime (pages&#x2F;server actions&#x2F;route handlers)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reading-upstream-Set-Cookie-in-Node-js"><span class="toc-number">2.3.</span> <span class="toc-text">Reading upstream Set-Cookie in Node.js</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Reading-server-Set-Cookie-via-next-headers"><span class="toc-number">2.4.</span> <span class="toc-text">Reading server Set-Cookie via next&#x2F;headers</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Writing-Set-Cookie-Use-append-not-set"><span class="toc-number">3.</span> <span class="toc-text">3) Writing Set-Cookie: Use append, not set</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Parsing-Set-Cookie-Common-Pitfalls"><span class="toc-number">4.</span> <span class="toc-text">4) Parsing Set-Cookie: Common Pitfalls</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Recommendations"><span class="toc-number">4.1.</span> <span class="toc-text">Recommendations</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Example-Robust-parsing-amp-forwarding-Node-js"><span class="toc-number">4.2.</span> <span class="toc-text">Example: Robust parsing &amp; forwarding (Node.js)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Takeaways"><span class="toc-number">5.</span> <span class="toc-text">Takeaways</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/"><i class="fa fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&text=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&title=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&is_video=false&description=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices&body=Check out this article: https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/"><i class="fa fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&title=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&title=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&title=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&title=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices"><i class="fa fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/&name=Next.js Edge vs Node.js: Middleware, Cookies, and Set-Cookie Best Practices&description="><i class="fa fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+      <ul>
+        <li id="toc"><a class="icon" href="#" onclick='$("#toc-footer").toggle();return false;'><i class="fa fa-list fa-lg" aria-hidden="true"></i> TOC</a></li>
+        <li id="share"><a class="icon" href="#" onclick='$("#share-footer").toggle();return false;'><i class="fa fa-share-alt fa-lg" aria-hidden="true"></i> Share</a></li>
+        <li id="top" style="display:none"><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a></li>
+        <li id="menu"><a class="icon" href="#" onclick='$("#nav-footer").toggle();return false;'><i class="fa fa-bars fa-lg" aria-hidden="true"></i> Menu</a></li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+    
+    <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2025 jsgao0
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="https://github.com/jsgao0">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
