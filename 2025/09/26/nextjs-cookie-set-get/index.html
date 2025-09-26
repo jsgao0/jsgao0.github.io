@@ -13,8 +13,9 @@
 <meta property="og:site_name" content="Anson Keeps">
 <meta property="og:description" content="Explaining the runtime differences between Edge and Node.js in Next.js, cookie handling, and best practices for working with Set-Cookie headers.">
 <meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/cookie-in-nextjs.png">
 <meta property="article:published_time" content="2025-09-25T16:00:00.000Z">
-<meta property="article:modified_time" content="2025-09-26T15:35:58.931Z">
+<meta property="article:modified_time" content="2025-09-26T15:52:36.300Z">
 <meta property="article:author" content="jsgao0">
 <meta property="article:tag" content="Cookies">
 <meta property="article:tag" content="Next.js">
@@ -23,6 +24,7 @@
 <meta property="article:tag" content="Set-Cookie">
 <meta property="article:tag" content="Web Dev">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://jsgao0.github.io/2025/09/26/nextjs-cookie-set-get/cookie-in-nextjs.png">
     
     
         
@@ -211,7 +213,8 @@
   
 
   <div class="content" itemprop="articleBody">
-    <p>In Next.js 13&#x2F;14 (App Router), the <strong>runtime environment</strong> defines what APIs you can use and how certain behaviors differ. While building unified login flows and tracking systems, I’ve run into several recurring issues around cookies and <code>Set-Cookie</code>. This post summarizes key points:  </p>
+    <p><img src="/2025/09/26/nextjs-cookie-set-get/cookie-in-nextjs.png" alt="Next.js Edge vs Node.js – Cookies Illustration"></p>
+<p>In Next.js 13&#x2F;14 (App Router), the <strong>runtime environment</strong> defines what APIs you can use and how certain behaviors differ. While building unified login flows and tracking systems, I’ve run into several recurring issues around cookies and <code>Set-Cookie</code>. This post summarizes key points:  </p>
 <ol>
 <li>Middleware runs on <strong>Edge Runtime</strong>, while pages&#x2F;layouts&#x2F;route handlers run on <strong>Node.js Runtime</strong>.  </li>
 <li>How to access cookies in both environments, and how Node.js can read upstream and server <code>Set-Cookie</code>.  </li>
